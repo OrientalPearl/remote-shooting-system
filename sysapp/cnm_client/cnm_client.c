@@ -385,7 +385,8 @@ void upload_size_update(void)
 {
     static time_t last_check_time = 0;
     static unsigned long long last_record_size = 0;
-    struct tm* tblock, *tblock2;
+    struct tm* tblock;
+	int last_day = 0;
     int update = 0;
     
     time_t now = time(NULL);
@@ -405,9 +406,11 @@ void upload_size_update(void)
     last_check_time = now;
         
 	tblock = localtime( &ysf_upload_check_time );
-    tblock2 = localtime( &now );
+	last_day = tblock->tm_mday;
+	
+    tblock = localtime( &now );
 
-    if (tblock->tm_mday != tblock2->tm_mday)
+    if (tblock->tm_mday != last_day)
     {
         ysf_upload_size = 0;
         ysf_upload_overflow = 0;
