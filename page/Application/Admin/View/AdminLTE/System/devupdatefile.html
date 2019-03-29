@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title> {$action} | {:C('WRT_TITLE')}</title>
+
+    <include file="Public:head"/>
+
+</head>
+<body class="skin-blue">
+
+{:W('Common/header')}
+
+
+
+<div class="wrapper row-offcanvas row-offcanvas-left">
+    {:W('Common/sideMenu')}
+
+
+    <!-- Right side column. Contains the navbar and content of the page -->
+    <aside class="right-side">
+        <!-- Content Header (Page header) -->
+
+
+        <section class="content-header">
+            <h1>
+                {$action}
+                <small>{$Think.config.title}</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="{$module_url}"><i class="fa fa-dashboard"></i> {$module}</a></li>
+                <li class="active">{$action}</li>
+            </ol>
+        </section>
+        <!-- Main content -->
+        <section class="content">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box box-warning">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                        	<!-- BEGIN EXAMPLE TABLE PORTLET-->       
+                           	<form action="{:U('Admin/System/devupdateCommit')}"
+                            	class="form-horizontal" method="post" id="devupdatecommit_form" enctype="multipart/form-data">	
+                            
+                            <input type="text" style="display:none" name="dev_type" value="{:$dev_type}"/>
+                            
+                            <div class="form-group">
+                                <div class="controls">
+								    <label class="control-label" >升级文件：</label>
+                                	<input type="file" class="form-control large" name="file1" id="file1" size=50/>
+                                </div>
+								&nbsp;
+								
+								<div class="controls">
+									<switch name="dev_type">
+		                            	<case value="router">
+		                                	<label class="control-label" >路由器版本号：</label>
+                                			<input type="text"class="form-control large" name="version" size=50/>[1.0.0.1-9.255.255.255]
+		                                </case>
+		                                    
+		                                <default/>
+		                                   	<label class="control-label" >x86版本号：</label>
+                                			<input type="text"class="form-control large" name="version" size=50/>[10.0.0.1-19.255.255.255]
+		                            </switch>
+                                </div>							
+                           	</div>			
+                           	<div class="form-actions">
+                                <button type="submit" class="btn btn-info submit">确定</button>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- /.content -->
+    </aside>
+    <!-- /.right-side -->
+</div>
+<!-- ./wrapper -->
+
+<include file="Public:foot"/>
+<script type="text/javascript">
+</body>
+</html>

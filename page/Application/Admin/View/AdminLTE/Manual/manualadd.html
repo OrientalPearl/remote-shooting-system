@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title> {$action} | {:C('WRT_TITLE')}</title>
+
+    <include file="Public:head"/>
+
+</head>
+<body class="skin-blue">
+
+{:W('Common/header')}
+
+<div class="wrapper row-offcanvas row-offcanvas-left">
+    {:W('Common/sideMenu')}
+
+
+    <!-- Right side column. Contains the navbar and content of the page -->
+    <aside class="right-side">
+        <!-- Content Header (Page header) -->
+
+
+        <section class="content-header">
+            <h1>
+                {$action}
+                <small>{$Think.config.title}</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="{$module_url}"><i class="fa fa-dashboard"></i> {$module}</a></li>
+                <li class="active">{$action}</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="row">
+                <div class="col-md-10">
+                    <div class="box box-warning">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                        	<!-- BEGIN EXAMPLE TABLE PORTLET-->
+                            <switch name="action_name">
+                            	<case value="editUser">
+                                	<form action="{:U('Admin/System/adminEditHandle')}"
+                                    	class="form-horizontal" id="newuser" method="post">
+                                    </case>
+                                    
+                                    <default/>
+                                    <form action="{:U('Admin/System/adminAddHandle')}"
+                                          class="form-horizontal" id="newuser" method="post">
+                            </switch>
+  
+                            <input type="text" style="display:none" name="user_id" value="{:$info['id']}"/>
+                            
+
+                            <div class="form-group">
+                            	<label class="control-label">用户名：</label>
+
+                           		<div class="controls">
+								   <switch name="action_name">
+			                         	<case value="addUser">                                	
+										<input id="user_login" type="text" placeholder="用户名(必填)"" class="form-control large" name="user_login" value="{:$info['name']}"/>
+			                            </case>
+			                            	
+			                            <default/>                                	
+										<input type="text" class="form-control large" name="user_login" value="{:$info['name']}"/>
+		                            </switch>
+
+                                </div>
+                            </div>
+                                                     
+                            <div class="form-group" <if condition="$action_name != 'editUser'"> style="display:none" </if>>
+								<label class="control-label">修改密码：</label>
+								<div class="controls">
+									<input type="checkbox" name="modify_pwd" id="modify_pwd" checked="checked" value="1" /> 
+				                        <span class="help-inline"></span>
+	                           	</div>
+                            </div>
+                            
+                            <div id='div_password' name='div_password'>
+	                            <div class="form-group">
+		                            <switch name="action_name">
+			                         	<case value="editUser">
+			                        		<label class="control-label">新密码：</label>
+			                            </case>
+			                            	
+			                            <default/>
+											<label class="control-label">密码：</label>
+		                            </switch>
+		                            <div class="controls">
+		                                <input type="password" placeholder="******(必填)""
+			                                		class="form-control large" name="password" id="password" value=""/>
+										<span class="help-inline"></span>
+	                            	</div>
+	                           	</div>
+	                           	<div class="form-group">
+	                                <switch name="action_name">
+	                                    <case value="addUser">
+	                                        <label class="control-label">确认密码：</label>                                            
+	                                    </case>
+	                                    	 
+	                                    <default/>
+	                                    	<label class="control-label">确认新密码：</label>
+	                                </switch>
+	                                <div class="controls">
+	                                	<input type="password" placeholder="******(必填)""
+	                                    	class="form-control large" name="rpassword" id="rpassword" value=""/>
+	                                    <span class="help-inline"></span>
+	                                </div>
+	                            </div>
+                            </div>
+                            
+                            </div>
+                            
+                            <div class="form-group">
+                           		<label class="control-label">备注：</label>
+                            	<div class="controls">
+                                	<input id="remark" type="text" placeholder="备注" class="form-control large"
+                                    	name="user_remark" value="{:$info['remark']}"/>
+                                </div>
+                            </div>
+                            
+                                
+                           	<div class="form-actions">
+
+	                               	<switch name="action_name">
+	                                	<case value="editUser">
+											<a href="javascript:;" class="btn btn-info" id="button_edit"><i
+												class="icon-ok"></i>
+											修改</case>
+	                                    <case value="addUser">
+											<a href="javascript:;" class="btn btn-info" id="button_add"><i
+												class="icon-ok"></i>
+											添加</case>
+	                                	<default/>
+											添加
+	                                </switch>
+                               	</a>
+                                    
+                                &nbsp;&nbsp;
+                                    
+                                <a href="{:U('Admin/System/admin')}" class="btn btn-info" id="button"><i
+                                	class="icon-ok"></i>
+                                    	返回
+								</a>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- /.content -->
+    </aside>
+    <!-- /.right-side -->
+</div>
+<!-- ./wrapper -->
+
+<include file="Public:foot"/>
+
+<style type="text/css">
+	em.error {
+		background:url("__PUBLIC__/share/img/unchecked.gif") no-repeat 4px 4px;
+		padding-left: 20px;
+	}
+
+	em.error { color: red; }
+</style>
+<script type="text/javascript">
+
+$.validator.addMethod("passwd_same",function(value,element,params){
+    if($("#password").val() == $("#rpassword").val()){
+        return true;
+    }
+	else{
+        return false;
+    }
+},"两次输入的密码不一致");
+
+$.validator.addMethod("passwd_no_null",function(value,element,params){
+	if($("#form_action").val() == "editUser"){    
+		return true;
+	}
+	if(value != ""){
+		return true;
+	}
+	else{
+		return false;
+	}
+
+},"密码不能为空");
+
+$().ready(function() {
+    $('#modify_pwd').on('ifChecked', function (event) {
+    	document.getElementById('div_password').style.display = "";
+    });
+    
+    $('#modify_pwd').on('ifUnchecked', function (event) {
+    	document.getElementById('div_password').style.display = "none";
+    });
+  $("#newuser").validate({
+    errorElement: "em",
+	rules: {
+		user_login: {
+			required: true,
+			maxlength: 64
+		},	
+		password: {
+			minlength: 3,
+			maxlength: 16,
+			passwd_no_null: ""
+		},		
+		rpassword: {
+			minlength: 3,
+			maxlength: 16,
+			passwd_no_null: "",
+			passwd_same: ""
+		},
+		remark: {
+			maxlength: 128
+		}
+    },
+    messages: {		
+		user_login: {
+			required: "请输入用户名",
+			maxlength: "用户名必需小于64个字符"
+		},				
+		password: {
+			minlength: "密码必需大于2个字符",
+			maxlength: "密码必需小于16个字符",
+			passwd_no_null: "密码不能为空"
+		},		
+		rpassword: {
+			minlength: "密码必需大于2个字符",
+			maxlength: "密码必需小于16个字符",
+			passwd_no_null: "密码不能为空",
+			passwd_same: "两次输入的密码不一致"
+		},
+		remark: {
+			maxlength: "用户名描述必需小于128个字符"
+		}
+    }
+    });
+	
+	
+	$("#button_add").click(function(){
+		if($("#newuser").valid()){
+			$("#newuser").submit();
+		}
+	});	
+	
+	$("#button_edit").click(function(){
+		if($("#newuser").valid()){
+			$("#newuser").submit();
+		}
+	});
+});
+
+</script>
+
+</body>
+</html>

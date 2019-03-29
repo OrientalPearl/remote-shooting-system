@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title> {$action} | {:C('WRT_TITLE')}</title>
+
+    <include file="Public:head"/>
+
+</head>
+<body class="skin-blue">
+
+{:W('Common/header')}
+
+<div class="wrapper row-offcanvas row-offcanvas-left">
+{:W('Common/sideMenu')}
+
+
+<!-- Right side column. Contains the navbar and content of the page -->
+<aside class="right-side">
+<!-- Content Header (Page header) -->
+
+
+<section class="content-header">
+    <h1>
+        {$action}
+        <small>{$Think.config.title}</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="{$module_url}"><i class="fa fa-dashboard"></i> {$module}</a></li>
+        <li class="active">{$action}</li>
+    </ol>
+</section>
+
+<!-- Main content -->
+<section class="content">
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="box box-warning">
+            <!-- /.box-header -->
+            <div class="box-body">
+            	<div class="well">
+                    <h4>欢迎使用YSF远程拍摄管理系统</h4>
+                </div>
+               	
+               	<div class="box-header">
+                	<h4 class="box-title">关于我们</h3>
+            	</div>
+            	<div class="well">
+                    <h5>版权信息：2018-{:date('Y')} &copy; YSF {:C('software_version')}</h4>
+                </div>
+        	</div>
+        </div>
+    </div>
+</div>
+
+</section>
+<!-- /.content -->
+</aside>
+<!-- /.right-side -->
+</div>
+<!-- ./wrapper -->
+
+<include file="Public:foot"/>
+
+</body>
+</html>

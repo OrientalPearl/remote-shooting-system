@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title> {$action} | {:C('WRT_TITLE')}</title>
+
+    <include file="Public:head"/>
+
+</head>
+<body class="skin-blue">
+
+{:W('Common/header')}
+
+<div class="wrapper row-offcanvas row-offcanvas-left">
+    {:W('Common/sideMenu')}
+
+
+    <!-- Right side column. Contains the navbar and content of the page -->
+    <aside class="right-side">
+        <!-- Content Header (Page header) -->
+
+
+        <section class="content-header">
+            <h1>
+                {$action}
+                <small>{$Think.config.title}</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="{$module_url}"><i class="fa fa-dashboard"></i> {$module}</a></li>
+                <li class="active">{$action}</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box box-warning">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+							<form method="POST" action="{:U('Admin/DeviceManage/onlineUser', array('device_mac' => $device_mac))}" id="posts">
+								<div class="portlet-body">
+                                   <div class="row">                                       <div class="col-md-3 margin">
+                                            <label>每页显示{:C('PAGER')}</label>
+                                            <select style="width:60px"
+                                                    onchange="self.location.href=options[selectedIndex].value"
+                                                    size="1"
+                                                    name="mlink2">
+													<option value="__SELF__&page=20" <php> if ($page == 20) {echo selected;} </php> >20</option>
+	                                                <option value="__SELF__&page=50" <php> if ($page == 50) {echo selected;} </php> >50</option>
+	                                                <option value="__SELF__&page=100" <php> if ($page == 100) {echo selected;} </php> >100</option>
+	                                                <option value="__SELF__&page=200" <php> if ($page == 200) {echo selected;} </php> >200</option>
+                                            </select>
+											<label>条</label>
+                                        </div>
+                                        <div class="col-md-3 margin">
+                                            <label>总共{$total_count}条</label>
+                                        </div>
+                                    </div>
+									<table class="table table-striped table-bordered table-hover">
+									<thead>
+										<tr>
+											<th>序号</td>
+											<th>设备mac</td>
+											<th>用户mac</td>
+											<th>上行流量Byte</td>
+											<th>下行流量Byte</td>
+											<th>用户类型</td>
+											<th>上线时间</td>
+										</tr>
+									</thead>
+									<volist name="list" id="vo">
+										<tr class="odd gradeX">
+		                                    <td><?=$i?></td>
+		                                    <td>{$vo.device_mac}</td>
+		                                    <td>{$vo.mac}</td>
+		                                    <td>{$vo.up_bytes}</td>
+		                                    <td>{$vo.dn_bytes}</td>
+		                                    <td>
+		                                    <php>
+												$black_type = array (
+													0 => "<a style='color:red;' href='javascript:void(0);'>未认证用户</a>",
+													1 => '认证用户',
+													2 => "<a style='color:red;' href='javascript:void(0);'>黑名单</a>",
+													3 => '白名单'
+													);
+												if(array_key_exists($vo['is_black'], $black_type)){
+													echo $black_type [$vo['is_black']] ;
+												}else{
+													echo '正常';
+												}
+		                                    </php>
+		                                    </td>
+		                                    <td>{$vo.online_time|date='Y-m-d H:i:s',###}</td>
+                                    	</tr>
+                                	</volist>
+                            	</table>
+
+				    			<div class="pagination">
+	                                <ul class="pagination inline"> {$pager_bar}</ul>
+	                            </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </section>
+        <!-- /.content -->
+    </aside>
+    <!-- /.right-side -->
+</div>
+<!-- ./wrapper -->
+
+<include file="Public:foot"/>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title> {$action} | {:C('WRT_TITLE')}</title>
+
+    <include file="Public:head"/>
+
+</head>
+<body class="skin-blue">
+
+{:W('Common/header')}
+
+<div class="wrapper row-offcanvas row-offcanvas-left">
+    {:W('Common/sideMenu')}
+
+
+    <!-- Right side column. Contains the navbar and content of the page -->
+    <aside class="right-side">
+        <!-- Content Header (Page header) -->
+
+
+        <section class="content-header">
+            <h1>
+                {$action}
+                <small>{$Think.config.title}</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="{$module_url}"><i class="fa fa-dashboard"></i> {$module}</a></li>
+                <li class="active">{$action}</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="row">
+            	<div class="col-md-12">
+                    <div class="box box-warning">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+							<form method="POST" action="{:U('Admin/DeviceManage/devlistSearch')}" id="posts">
+								<div class="portlet-body">
+                                   <div class="row">
+                                        <div class="col-md-12 margin">
+										
+	                                        <input type="text" name="search_serial" 
+	                                     		placeholder="序列号" value="{$_SESSION['search_field']['serial']}">
+	                                     	&nbsp;&nbsp;
+
+	                                     	<input type="text" name="search_version"
+	                                     		placeholder="固件版本" value="{$_SESSION['search_field']['version']}">
+	                                     	&nbsp;&nbsp;
+	                                     	
+	                                     	<select name="search_user_id" tabindex="1" style={$user['type']==2?"display:none":""}>
+	                                     		<option value="">选择管理员</option>
+		                                    	<volist name="list_user" id="vo">
+													<option value="{$vo.id}" <php> if ($_SESSION['search_field']['user_id'] == $vo['id']) { echo "selected"; } </php> > {$vo['name']}</option>
+												</volist>
+		                                    </select>
+	                                     	&nbsp;&nbsp;
+											
+	                                     	<select name="search_status"  tabindex="1">
+	                                     		<option value="">选择状态</option>
+	                                     		<option value="1" <php>if ($_SESSION['search_field']['status'] == 1) { echo "selected"; } </php> >在线</option>
+	                                     		<option value="2" <php>if ($_SESSION['search_field']['status'] == 2) { echo "selected"; } </php> >不在线</option>
+		                                    </select>
+	                                     	&nbsp;&nbsp;
+			                                        	
+	                                     	<button title='查找' type="submit" name="search" class='btn' value='1'> 
+												<img height='18px' src="__PUBLIC__/AdminLTE/img/searchbtn.jpg"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+				
+				
+                <div class="col-md-12">
+                    <div class="box box-warning">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+							<form method="POST" action="{:U('Admin/DeviceManage/deviceHandle')}" id="posts">
+								<div class="portlet-body">
+                                   <div class="row">
+                                        <div class="col-md-5 margin">
+										   <div class="btn-group"  style={$user['type']==2?"display:none":""}>
+                                                <a href="{:U('Admin/DeviceManage/deviceEdit')}">
+                                                    <button type="submit" class="btn btn-success" name="deviceAdd"
+                                                            value='1'>
+                                                        <i class="icon-plus"></i> 新增设备
+                                                    </button>
+                                                </a>
+                                            </div>
+											
+                                            <div class="btn-group">
+                                                <button type="submit" class="btn btn-danger" name="delAll" value='1'><i
+                                                        class="icon-remove icon-white">
+                                                </i> 批量删除
+                                                </button>
+                                            </div>
+											<!--
+                                            <div class="btn-group">
+	                                            <a title="导出" target="ajaxTodo" href="{:U('Admin/DeviceManage/devExportXls')}">
+			                                        <img height='40px' src="__PUBLIC__/AdminLTE/img/printbtn.png"></a>
+		                                    </div> 
+											-->
+                                        </div>
+
+                                       <div class="col-md-3 margin">
+                                            <label>每页显示{:C('PAGER')}</label>
+                                            <select style="width:60px"
+                                                    onchange="self.location.href=options[selectedIndex].value"
+                                                    size="1"
+                                                    name="mlink2">
+													<option value="__SELF__&page=20" <php> if ($page == 20) {echo selected;} </php> >20</option>
+	                                                <option value="__SELF__&page=50" <php> if ($page == 50) {echo selected;} </php> >50</option>
+	                                                <option value="__SELF__&page=100" <php> if ($page == 100) {echo selected;} </php> >100</option>
+	                                                <option value="__SELF__&page=200" <php> if ($page == 200) {echo selected;} </php> >200</option>
+                                            </select>
+											<label>条</label>
+                                        </div>
+                                        
+                                        <div class="col-md-3 margin">
+                                            <label>总共{$total_count}条</label>
+                                        </div>
+                                    </div>
+									<table class="table table-striped table-bordered table-hover">
+									<thead>
+										<tr>
+											<th style="width: 8px;">
+												<input type="checkbox" class="group-checkable" id="check-all" data-set="#post_table .checkboxes"/>
+											</th>
+											<th>序号</td>
+											<th>序列号</td>
+											
+											
+											<th style={$user['type']==2?"display:none":""}>管理员</th>
+											
+											<th>拍摄状态</td>
+											<th>固件版本</td>
+											<th>自动升级</td>
+											<th>光圈</td>
+											<th>快门</td>
+											<th>ISO</td>
+											<th>市电状态</td>
+											<th>温/湿度</td>
+											<th style={$user['type']==2?"display:none":""}>磁盘/带宽限制</th>
+											<th>状态</td>
+											<th>操作</td>
+										</tr>
+									</thead>
+									<volist name="list" id="vo">
+											<tr class="odd gradeX">
+                                                <td><input type="checkbox" class="checkboxes" value="{$vo.mac}"
+                                                           name="uid_chk_box[]"/>
+                                                </td>
+		                                        <td><?=$i?></td>
+												<td>{$vo.serial}</td>
+												
+											
+												<td style={$user['type']==2?"display:none":""}>{$vo.user_name}</td>
+											
+		                                        <td><php>if ($vo['tasks_status'] != 0) {echo "正常";} else {echo "停止";}</php></td>
+		                                        <td>{$vo.version}</td>
+		                                        <td><php>if ($vo['auto_upgrade'] != 0) {echo "是";} else {echo "否";}</php></td>
+		                                        <td>{$vo.aperture_current}</td>
+												<td>{$vo.shutter_current}</td>
+												<td>{$vo.iso_current}</td>
+		                                        <td>{$vo.electricity}</td>
+		                                        
+		                                        <td><php>if ($vo['temperature']) {echo $vo['temperature'];} else {echo "-";}</php>/<php>if ($vo['humiture']) {echo $vo['humiture'];} else {echo "-";}</php></td>     
+												
+												<td style={$user['type']==2?"display:none":""}>{$vo['disk_size']/1000}GB/{$vo.upload_limit_day}MB/{$vo['bwlimit']*8/1000}Mbps</td>
+												
+												<td><php>if ($vo['device_ip'] != 0) {echo "在线";} else {echo "不在线";}</php></td>                                      
+												<td>
+													<a title="编辑" target="ajaxTodo" href="{:U('Admin/DeviceManage/deviceEdit', array('serial' => $vo['serial']))}">
+			                                        	<img height='18px' src="__PUBLIC__/AdminLTE/img/editbtn.jpg"></a>                                                    
+                                                   		
+													<!--
+			                                        <a title="事件日志" href="{:U('Admin/DeviceManage/deveventlog', array('serial' => $vo['serial']))}">
+			                                        	<img height='18px' src="__PUBLIC__/AdminLTE/img/eventbtn.png"></a> 
+					                                
+													<a title="设定当前操作设备" target="ajaxTodo" onclick="javascript:return confirm('要设定这台设备为当前操作设备吗?')" href="{:U('Admin/DeviceManage/deviceCurrent', array('serial' => $vo['serial']))}">
+			                                        	<img height='18px' src="__PUBLIC__/AdminLTE/img/timg.jpg"></a>
+													-->
+			                                        <a title="删除记录" target="ajaxTodo" onclick="javascript:return confirm('确实要删除这条记录吗?')" href="{:U('Admin/DeviceManage/deviceDel', array('serial' => $vo['serial']))}">
+			                                        	<img height='18px' src="__PUBLIC__/AdminLTE/img/deletebtn.png"></a>
+			                        
+		                                    </div> 
+                                       		 	</td>
+                                    </tr>
+                                </volist>
+                            </table>
+
+			    			<div class="pagination">
+                                <ul class="pagination inline"> {$pager_bar}</ul>
+                            </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- /.content -->
+    </aside>
+    <!-- /.right-side -->
+</div>
+<!-- ./wrapper -->
+
+<include file="Public:foot"/>
+</body>
+</html>

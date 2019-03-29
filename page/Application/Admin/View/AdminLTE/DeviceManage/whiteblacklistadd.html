@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title> {$action} | {:C('WRT_TITLE')}</title>
+
+    <include file="Public:head"/>
+
+</head>
+<body class="skin-blue">
+
+{:W('Common/header')}
+
+<div class="wrapper row-offcanvas row-offcanvas-left">
+    {:W('Common/sideMenu')}
+
+
+    <!-- Right side column. Contains the navbar and content of the page -->
+    <aside class="right-side">
+        <!-- Content Header (Page header) -->
+
+
+        <section class="content-header">
+            <h1>
+                {$action}
+                <small>{$Think.config.title}</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="{$module_url}"><i class="fa fa-dashboard"></i> {$module}</a></li>
+                <li class="active">{$action}</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="row">
+                <div class="col-md-10">
+                    <div class="box box-warning">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                        	<!-- BEGIN EXAMPLE TABLE PORTLET-->
+                            <form action="{:U('Admin/DeviceManage/whiteBlackListAddHandle')}"
+                            	class="form-horizontal" id="newuser" method="post">
+                            	
+                            	<input type="text" style="display:none" name="jump_url" value="{:$jump_url}"/>
+                            
+	                            <div class="form-group">
+	                            	<label class="control-label">用户类型：</label>
+	                                <div class="controls">
+	                                	<select id="user_type" name="user_type" class="large form-control" tabindex="1">
+	                                    	<option value="2">黑名单</option>
+	                                    	<option value="3">白名单</option>
+	                                    </select>
+	                                </div>
+	                           	</div> 
+                            
+	                            <div class="form-group">
+	                            	<label class="control-label">设备mac：</label>
+	                           		<div class="controls">
+	                                	<input type="text" placeholder="设备mac(必填)" class="form-control large"
+	                                    	value="{:$device_mac}"  name="dev_mac"/>
+	                                </div>
+	                            </div>
+	                            
+	                            <div class="form-group">
+	                            	<label class="control-label">用户mac：</label>
+	                           		<div class="controls">
+	                                	<input type="text" placeholder="用户mac(必填)" class="form-control large"
+	                                    	name="user_mac"/>
+	                                </div>
+	                            </div>
+    
+	                           	<div class="form-actions">
+	                            	<a href="javascript:;" class="btn btn-info" id="button"><i
+	                                	class="icon-ok"></i>
+		                               	添加
+	                               	</a>
+	                                    
+	                                &nbsp;&nbsp;	                                    
+	                                <input type="button" class="btn btn-info" onclick="javascript:history.back(-1);" value="返回">
+	                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- /.content -->
+    </aside>
+    <!-- /.right-side -->
+</div>
+<!-- ./wrapper -->
+
+<include file="Public:foot"/>
+<script src="__PUBLIC__/AdminLTE/js/jsAddress.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function () {    
+    $("#button").click(
+    	function () {
+        	if ($("input[name='dev_mac']").val() == ''
+                || $("input[name='user_mac']").val() == '') {
+                    alert("信息不完整！");
+                } else {
+                    $("#newuser").submit();
+        	}
+    }); 	
+});
+</script>
+</body>
+</html>

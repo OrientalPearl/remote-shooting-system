@@ -1,0 +1,41 @@
+<?php if (!defined('THINK_PATH')) exit();?><!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+	<style type="text/css">
+		.divpreview{ 
+			border:1px solid #000; 
+			width:100%; 
+			overflow:hidden
+		} 
+		.divpreview img{
+			max-width:100%;
+		} 
+	</style>
+
+</head>
+<body class="skin-blue">
+
+
+<div class="wrapper row-offcanvas row-offcanvas-left">
+
+
+    <!-- Right side column. Contains the navbar and content of the page -->
+    <aside class="right-side">
+        <!-- Content Header (Page header) -->
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="divpreview" align="center">
+				<img class="img" src="<?php echo ($image); ?>">
+			</div>
+        </section>
+        <!-- /.content -->
+    </aside>
+    <!-- /.right-side -->
+</div>
+<!-- ./wrapper -->
+
+</body>
+</html>

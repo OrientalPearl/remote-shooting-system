@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title> {$action} | {:C('WRT_TITLE')}</title>
+
+    <include file="Public:head"/>
+
+</head>
+<body class="skin-blue">
+
+{:W('Common/header')}
+
+
+
+<div class="wrapper row-offcanvas row-offcanvas-left">
+    {:W('Common/sideMenu')}
+
+
+    <!-- Right side column. Contains the navbar and content of the page -->
+    <aside class="right-side">
+        <!-- Content Header (Page header) -->
+
+
+        <section class="content-header">
+            <h1>
+                {$action}
+                <small>{$Think.config.title}</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="{$module_url}"><i class="fa fa-dashboard"></i> {$module}</a></li>
+                <li class="active">{$action}</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box box-warning">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                        	<!-- BEGIN EXAMPLE TABLE PORTLET-->       
+
+                           <form action="{:U('Admin/System/emailUpdate')}"
+                               class="form-horizontal" method="post" id="email_form">
+							
+                               		
+                            <div class="form-group-list">
+								<div class="controls">
+								    <label class="control-label">邮件服务器地址：</label>
+                                    <input type='text' placeholder="邮件服务器地址" class="form-control large" value="{$data['email_server_address']}" name='email_server_address' id='email_server_address'/>
+                                </div>
+								&nbsp;
+								
+								<div class="controls">
+								    <label class="control-label">邮件服务器端口：</label>
+                                    <input type='text' placeholder="邮件服务器端口, 一般使用587端口" class="form-control large" value="{$data['email_server_port']}" name='email_server_port' id='email_server_port'/>
+                                </div>
+								&nbsp;
+								
+								<div class="controls">
+								    <label class="control-label">发件人地址：</label>
+                                    <input type='text' placeholder="发件人地址" class="form-control large" value="{$data['email_sender']}" name='email_sender' id='email_sender'/>
+                                </div>
+								&nbsp;
+								
+								<div class="controls">
+								    <label class="control-label">发件人显示名：</label>
+                                    <input type='text' placeholder="发件人显示名" class="form-control large" value="{$data['email_sender_show']}" name='email_sender_show' id='email_sender_show'/>
+                                </div>
+								&nbsp;
+								
+								<!--
+								<div class="controls">
+									<label class="control-label">是否需要认证：</label>
+									
+									<select name="email_auth" id="email_auth" class="large form-control">
+										<option value="">选请择认证方式</option>
+										<option value="0" <if condition="$data.email_auth eq '0'"> selected </if> > 不需要认证 </option>
+										<option value="1" <if condition="$data.email_auth eq '1'"> selected </if> > 需要认证 </option>
+									</select>
+								
+								</div>
+
+								&nbsp;
+								<div class="controls" id='email_auth_user_outer'>
+								    <label class="control-label">用户名：</label>
+                                    <input type='text' class="form-control large" value="{$data['email_auth_user']}" name='email_auth_user' id='email_auth_user'/>
+                                </div>
+								&nbsp;
+								-->
+								
+								<div class="controls" id='email_auth_passwd_outer'>
+								    <label class="control-label">第三方登陆授权码：</label>
+                                    <input type='text' placeholder="第三方登陆授权码，请到邮箱进行设置获取" class="form-control large" value="{$data['email_auth_passwd']}" name='email_auth_passwd' id='email_auth_passwd'/>
+                                </div>
+								&nbsp;
+
+								<div class="controls">
+								    <label class="control-label">邮件标题：</label>
+                                    <input type='text' placeholder="邮件标题" class="form-control large" value="{$data['email_subject']}" name='email_subject' id='email_subject'/>
+                                </div>
+								&nbsp;
+
+								<div class="controls">
+								    <label class="control-label">收件人地址：</label>
+                                    <textarea  placeholder="收件人地址" rows="8" class="form-control large" name='email_auth_receiver' id='email_auth_receiver'>{$data['email_auth_receiver']} </textarea>
+									<p style="display:inline">一行一个邮件地址</p>
+                                </div>
+								&nbsp;
+							</div>
+							
+                           	<div class="form-actions">
+                                <button type="submit" id="button_email" class="btn btn-info submit">确定</button>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- /.content -->
+    </aside>
+    <!-- /.right-side -->
+</div>
+<!-- ./wrapper -->
+
+<include file="Public:foot"/><style type="text/css">
+	em.error {
+		background:url("__PUBLIC__/share/img/unchecked.gif") no-repeat 4px 4px;
+		padding-left: 20px;
+	}
+
+	em.error { color: red; }
+</style>
+
+<script type="text/javascript">
+
+$().ready(function() {
+
+  $("#email_form").validate({
+    errorElement: "em",
+	rules: {
+		email_server_address: {
+			required: true
+		},
+		email_server_port: {
+			required: true
+		},		
+		email_sender: {
+			required: true
+		},
+		email_sender_show: {
+			required: true
+		},		
+		email_auth: {
+			required: true
+		},		
+		email_auth_user: {
+			required: true
+		},
+		email_auth_passwd: {
+			required: true
+		}
+    },
+    messages: {		
+		email_server_address: {
+			required: "请输入邮件服务器地址"
+		},
+		email_server_port: {
+			required: "请输入邮件服务器端口"
+		},
+		email_sender: {
+			required: "请选发件人发地址"
+		},
+		email_sender_show: {
+			required: "请输入发件人显示名"
+		},
+		email_auth: {
+			required: "请选择是否需要认证"
+		},
+		email_auth_user: {
+			required: "请输入用户名"
+		},
+		email_auth_passwd: {
+			required: "请输入第三方登陆授权码"
+		}
+    }
+    });
+	
+	
+	$("#button_email").click(function(){
+		if($("#email_form").valid()){
+			$("#email_form").submit();
+		}
+	});	
+
+	$('#email_auth').change(function(){ 
+		var p1 = $(this).children('option:selected').val();
+
+		if (p1 == "0") {
+			$("#email_auth_user_outer").hide();
+			$("#email_auth_passwd_outer").hide();
+		} else if (p1 == "1"){
+			$("#email_auth_user_outer").show();
+			$("#email_auth_passwd_outer").show();
+		}
+	});
+	
+	
+	if ($("#email_auth").val() == "0") {
+		$("#email_auth_user_outer").hide();
+		$("#email_auth_passwd_outer").hide();
+	} else if ($("#email_auth").val() == "1"){
+		$("#email_auth_user_outer").show();
+		$("#email_auth_passwd_outer").show();
+	}
+});
+
+</script>
+</body>
+</html>

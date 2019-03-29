@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title> {$action} | {:C('WRT_TITLE')}</title>
+
+    <include file="Public:head"/>
+	<style type="text/css">
+		.divpreview{ 
+			border:1px solid #000; 
+			width:100%; 
+			overflow:hidden
+		} 
+		.divpreview img{
+			max-width:100%;
+		} 
+	</style>
+</head>
+<body class="skin-blue">
+
+{:W('Common/header')}
+
+<div class="wrapper row-offcanvas row-offcanvas-left">
+    {:W('Common/sideMenu')}
+
+
+    <!-- Right side column. Contains the navbar and content of the page -->
+    <aside class="right-side">
+        <!-- Content Header (Page header) -->
+
+
+        <section class="content-header">
+            <h1>
+                {$action}
+                <small>{$Think.config.title}</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="{$module_url}"><i class="fa fa-dashboard"></i> {$module}</a></li>
+                <li class="active">{$action}</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="row">
+                <div class="col-md-10">
+                    <div class="box box-warning">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                        	<!-- BEGIN EXAMPLE TABLE PORTLET-->
+							<form action="{:U('Admin/ShootingControl/parameterEditHandle')}"
+								class="form-horizontal" id="newparameter" method="post">
+							
+							
+							<div class="form-group">
+                            	<label class="control-label">序列号：</label>
+
+                           		<div class="controls">
+								  <input id="serial" type="text" readonly="readonly" class="form-control large" name="serial" value="{:$devinfo['serial']}"/>
+                                </div>
+                            </div>
+														                                           	
+							<div class="form-group">
+                            	<label class="control-label">预览光圈 ：</label>
+
+                           		<div class="controls">
+									 <select id="aperture_preview" name="aperture_preview" class="large form-control" tabindex="1" >
+										<option value="">请选择光圈 </option>
+										<volist name="list_aperture" id="vo">
+											<option value={$vo.aperture} <if condition="$devinfo.aperture_preview eq $vo['aperture']"> selected </if>> {$vo.aperture} </option>
+										</volist>
+		                              </select>
+                                </div>
+                            </div>
+							
+							<div class="form-group">
+                            	<label class="control-label">预览快门 ：</label>
+
+                           		<div class="controls">									 
+								
+									<select id="shutter_preview" name="shutter_preview" class="large form-control" tabindex="1" >
+										<option value="">请选择快门 </option>
+										<volist name="list_shutter" id="vo">
+											<option value={$vo.shutter} <if condition="$devinfo.shutter_preview eq $vo['shutter']"> selected </if>> {$vo.shutter} </option>
+										</volist>
+		                              </select>
+                                </div>
+                            </div>
+							<div class="form-group">
+                            	<label class="control-label">预览ISO ：</label>
+
+                           		<div class="controls">									
+								
+									<select id="iso_preview" name="iso_preview" class="large form-control" tabindex="1" >
+										<option value="">请选择ISO </option>
+										<volist name="list_iso" id="vo">
+											<option value={$vo.iso} <if condition="$devinfo.iso_preview eq $vo['iso']"> selected </if>> {$vo.iso} </option>
+										</volist>
+		                              </select>
+                                </div>
+                            </div>
+							
+							<div class="form-group">
+                            	<label class="control-label">光圈范围 ：</label>
+								
+                           		<div class="controls">
+									 <select id="aperture_min" name="aperture_min" class="small form-control" tabindex="1" >
+										<option value="">光圈范围起始 </option>
+										<volist name="list_aperture" id="vo">
+											<option value={$vo.aperture} <if condition="$devinfo.aperture_min eq $vo['aperture']"> selected </if>> {$vo.aperture} </option>
+										</volist>
+		                              </select>
+									  &nbsp;&nbsp;
+									  <-->
+									  &nbsp;&nbsp;
+									   <select id="aperture_max" name="aperture_max" class="small form-control" tabindex="1" >
+										<option value="">光圈范围结束 </option>
+										<volist name="list_aperture" id="vo">
+											<option value={$vo.aperture} <if condition="$devinfo.aperture_max eq $vo['aperture']"> selected </if>> {$vo.aperture} </option>
+										</volist>
+		                              </select>
+								</div>
+							</div>
+							
+							<div class="form-group">
+                            	<label class="control-label">快门范围 ：</label>
+								
+                           		<div class="controls">
+									 <select id="shutter_min" name="shutter_min" class="small form-control" tabindex="1" >
+										<option value="">快门范围起始 </option>
+										<volist name="list_shutter" id="vo">
+											<option value={$vo.shutter} <if condition="$devinfo.shutter_min eq $vo['shutter']"> selected </if>> {$vo.shutter} </option>
+										</volist>
+		                              </select>
+									  
+									  &nbsp;&nbsp;
+									  <-->
+									  &nbsp;&nbsp;
+									  
+									 <select id="shutter_max" name="shutter_max" class="small form-control" tabindex="1" >
+										<option value="">快门范围结束 </option>
+										<volist name="list_shutter" id="vo">
+											<option value={$vo.shutter} <if condition="$devinfo.shutter_max eq $vo['shutter']"> selected </if>> {$vo['shutter']} </option>
+										</volist>
+		                              </select>
+                                </div>
+							</div>
+							
+							
+							<div class="form-group">
+                            	<label class="control-label">ISO范围 ：</label>
+								
+                           		<div class="controls">
+									 <select id="iso_min" name="iso_min" class="small form-control" tabindex="1" >
+										<option value="">ISO范围起始 </option>
+										<volist name="list_iso" id="vo">
+											<option value={$vo.iso} <if condition="$devinfo.iso_min eq $vo['iso']"> selected </if>> {$vo.iso} </option>
+										</volist>
+		                              </select>									 
+									  
+									  &nbsp;&nbsp;
+									  <-->
+									  &nbsp;&nbsp;
+									  
+									  <select id="iso_max" name="iso_max" class="small form-control" tabindex="1" >
+										<option value="">ISO范围结束 </option>
+										<volist name="list_iso" id="vo">
+											<option value={$vo.iso} <if condition="$devinfo.iso_max eq $vo['iso']"> selected </if>> {$vo.iso} </option>
+										</volist>
+		                              </select>
+                                </div>
+							</div>						
+							
+							<input id="button_type" type="hidden" name="button_type" value="button_preview"/>
+							
+							<div class="form-actions">
+
+								<a href="javascript:;" class="btn btn-info" id="button_preview"><i
+									class="icon-ok"></i>
+										拍摄预览
+                               	</a>
+								&nbsp;&nbsp;
+								
+								<a href="javascript:;" class="btn btn-info" id="button_apply"><i
+									class="icon-ok"></i>
+										设为拍摄参数
+                               	</a>
+								
+                                &nbsp;&nbsp;
+                                    
+                                <a href="{:U('Admin/ShootingControl/parameterlist')}" class="btn btn-info" id="button"><i
+                                	class="icon-ok"></i>
+                                    	返回
+								</a>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+		
+		
+		
+		<section class="content">
+            <div class="row">
+                <div class="col-md-10">
+                    <div class="box box-warning">
+						<div class="divpreview" align="center">
+							<a href="{:U('Admin/ShootingControl/parameterPreviewSrc', array('serial' => $devinfo['serial']))}" style="display:nome" id="preview_img_url"></a>
+							<img class="img" id="preview_img" class="divpreview" src="" alt="等待预览">
+						 </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+		
+        <!-- /.content -->
+    </aside>
+    <!-- /.right-side -->
+</div>
+<!-- ./wrapper -->
+
+<include file="Public:foot"/>
+<style type="text/css">
+	em.error {
+		background:url("__PUBLIC__/share/img/unchecked.gif") no-repeat 4px 4px;
+		padding-left: 20px;
+	}
+
+	em.error { color: red; }
+</style>
+<script type="text/javascript">
+
+function do_get_preview(){
+	var ret = 0;
+	var url_address = $("#preview_img_url").prop('href')
+	$.ajax({
+		url: url_address,
+		type: "POST",
+		success: function(resp){
+			//console.log(resp);
+			$("#preview_img").attr("src", resp);
+		},
+		error : function(o){	
+			console.log(o);
+		}
+	})
+	
+	return ret;
+}
+
+setInterval(do_get_preview, 6000);
+
+$.validator.addMethod("aperture_min_not_null",function(value,element,params){
+	if($("#button_type").val() == "button_preview")
+		return true;
+		
+	if($("#aperture_min").val() != ""){
+		return true;
+	}
+	else{
+		return false;
+	}
+
+},"");
+
+$.validator.addMethod("aperture_max_not_null",function(value,element,params){
+	if($("#button_type").val() == "button_preview")
+		return true;
+		
+	if($("#aperture_max").val() != ""){
+		return true;
+	}
+	else{
+		return false;
+	}
+
+},"");
+
+
+
+$.validator.addMethod("shutter_min_not_null",function(value,element,params){
+	if($("#button_type").val() == "button_preview")
+		return true;
+		
+	if($("#shutter_min").val() != ""){
+		return true;
+	}
+	else{
+		return false;
+	}
+
+},"");
+
+$.validator.addMethod("shutter_max_not_null",function(value,element,params){
+	if($("#button_type").val() == "button_preview")
+		return true;
+		
+	if($("#shutter_max").val() != ""){
+		return true;
+	}
+	else{
+		return false;
+	}
+
+},"");
+
+
+
+$.validator.addMethod("iso_min_not_null",function(value,element,params){
+	if($("#button_type").val() == "button_preview")
+		return true;
+		
+	if($("#iso_min").val() != ""){
+		return true;
+	}
+	else{
+		return false;
+	}
+
+},"");
+
+$.validator.addMethod("iso_max_not_null",function(value,element,params){
+	if($("#button_type").val() == "button_preview")
+		return true;
+		
+	if($("#iso_max").val() != ""){
+		return true;
+	}
+	else{
+		return false;
+	}
+
+},"");
+
+
+$().ready(function() {
+  $("#newparameter").validate({
+    errorElement: "em",
+	rules: {
+		serial: {
+			required: true,
+			rangelength:[4,4]
+		},
+		aperture_preview: {
+			required: true
+		},		
+		shutter_preview: {
+			required: true
+		},		
+		iso_preview: {
+			required: true
+		},
+		aperture_max: {
+			aperture_min_not_null: "",
+			aperture_max_not_null: ""
+		},
+		shutter_max: {
+			shutter_min_not_null: "",
+			shutter_max_not_null: ""
+		},
+		iso_max: {
+			iso_min_not_null: "",
+			iso_max_not_null: ""
+		}
+    },
+    messages: {		
+		serial: {
+			required: "请输入序列号",
+			rangelength: "序列号长度必须为4个字符"
+		},
+		aperture_preview: {
+			required: "请选择预览光圈"
+		},
+		shutter_preview: {
+			required: "请选择预览快门"
+		},
+		iso_preview: {
+			required: "请选择预览ISO"
+		},		
+		aperture_max: {
+			aperture_min_not_null: "请选择光圈范围起始",
+			aperture_max_not_null: "请选择光圈范围结束"
+		},
+		shutter_max: {
+			shutter_min_not_null: "请选择光圈范围起始",
+			shutter_max_not_null: "请选择光圈范围结束"
+		},
+		iso_max: {
+			iso_min_not_null: "请选择ISO范围起始",
+			iso_max_not_null: "请选择ISO范围结束"
+		}
+    }
+    });
+	
+	
+	$("#button_preview").click(function(){
+		$("#button_type").val("button_preview");
+		if($("#newparameter").valid()){
+			$("#newparameter").submit();
+		}
+	});	
+	
+	$("#button_apply").click(function(){
+		$("#button_type").val("button_apply");
+		if($("#newparameter").valid()){
+			$("#newparameter").submit();
+		}
+	});
+	
+	do_get_preview();
+});
+
+</script>
+</body>
+</html>

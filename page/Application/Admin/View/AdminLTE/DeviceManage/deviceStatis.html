@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+.tabs {
+	width: 100%; height: 32px; line-height: 32px; margin-left: 5px; border-bottom-color: rgb(233, 233, 233); border-left-color: rgb(233, 233, 233); border-bottom-width: 1px; border-left-width: 1px; border-bottom-style: solid; border-left-style: solid;border-top: 1px solid rgb(233, 233, 233);
+}
+.tabs li {
+	border-width: 1px 1px 1px medium; border-style: solid solid solid none; border-color: rgb(233, 233, 233) rgb(233, 233, 233) rgb(233, 233, 233) currentColor; margin: 0px 0px -1px; padding: 0px; height: 31px; text-transform: uppercase; line-height: 31px; overflow: hidden; font-family: "宋体",Arial,Helvetica,sans-serif; font-weight: 700; float: left; position: relative; background-image: url("../Images/NavBg.png");
+}
+.tabs li a {
+	padding: 0px 20px; outline: 0px; border: 1px solid rgb(255, 255, 255); color: rgb(153, 153, 153); font-size: 12px; text-decoration: none; display: block; -moz-transition: background-color .2s ease-out; transition: background-color .2s ease-out; -webkit-transition: background-color .2s ease-out; -o-transition: background-color .2s ease-out;
+}
+.tabs .tabItem a:hover {
+	color: rgb(0, 0, 0); background-image: url("../Images/NavBgHover.png");
+}
+.tabs .active.tabItem {
+	background: rgb(255, 255, 255); color: rgb(0, 0, 0); border-bottom-color: rgb(255, 255, 255); border-bottom-width: 1px; border-bottom-style: solid;
+}
+.tabs .active.tabItem a:hover {
+	background: rgb(255, 255, 255); color: rgb(0, 0, 0); border-bottom-color: rgb(255, 255, 255); border-bottom-width: 1px; border-bottom-style: solid;
+}
+.tabs .active a {
+	color: rgb(153, 0, 0); -moz-transition: background-color .2s ease-out; transition: background-color .2s ease-out; -webkit-transition: background-color .2s ease-out; -o-transition: background-color .2s ease-out;
+}
+.tabContainer {
+	margin: 0px auto; width: 99%;
+}
+.tabContainer .ftitle {
+	text-align: left;
+}
+.nomargin {
+	margin: 0px !important;
+}
+</style>
+    <meta charset="UTF-8">
+    <title> {$action} | {:C('WRT_TITLE')}</title>
+
+    <include file="Public:head"/>
+
+</head>
+<body class="skin-blue">
+
+{:W('Common/header')}
+
+<div class="wrapper row-offcanvas row-offcanvas-left">
+    {:W('Common/sideMenu')}
+
+
+    <!-- Right side column. Contains the navbar and content of the page -->
+    <aside class="right-side">
+        <!-- Content Header (Page header) -->
+        
+        
+
+
+        <section class="content-header">
+            <h1>
+                {$action}
+                <small>设备属性：mac({$device_mac})-ssid({$ssid})-商店名称({$shop_name})</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="{$module_url}"><i class="fa fa-dashboard"></i> {$module}</a></li>
+                <li class="active">{$action}</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <div>
+	        	<ul class="tabs nomargin">
+	        		<volist name="tabmenu" id="vo">
+	        			<if condition='$tabactive eq $vo[field]'>
+	        				<li class="tabItem active" ><a href="{$vo.url}">{$vo.name}</a></li>
+	        			<else />
+	        				<li class="tabItem" ><a href="{$vo.url}">{$vo.name}</a></li>      
+	        			</if>
+                    </volist>
+				</ul>
+	       	</div>
+	       	<div id="container_hourly" style="min-width:800px;height:400px;"></div>
+	       	<div id="container_dayly" style="min-width:800px;height:400px;"></div>
+	       	<div id="container_monthly" style="min-width:800px;height:400px;"></div>
+            
+        </section>
+        <!-- /.content -->
+    </aside>
+    <!-- /.right-side -->
+</div>
+<!-- ./wrapper -->
+<include file="Public:foot"/>
+<script type="text/javascript" src="__PUBLIC__/AdminLTE/js/Highcharts/js/highcharts.js"></script>
+<script>
+	 $(function () { 
+	    $('#container_hourly').highcharts({
+	        chart: {
+	            type: 'spline'
+	        },
+	        title: {
+	            text: "{:$data['hourly']['title']}"
+	        },
+	        subtitle: {
+	            text: ''
+	        },	        
+	        xAxis: {
+	          	type: 'datetime',
+	        	tickPixelInterval: 150  
+	        },
+	        yAxis: {
+	            title: {
+	                text: "{:$data['hourly']['y_title']}"
+	            },
+		        labels: {
+	                formatter: function() {
+	                    return this.value + "{:$data['hourly']['Suffix']}"
+	                }
+	            }
+	        },	        
+	        tooltip: { 
+	        	valueSuffix:"{:$data['hourly']['Suffix']}",                                              
+	            formatter: function() {                                             
+	                    return '<b>'+ this.series.name +'</b><br/>'+                
+	                    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
+	                    Highcharts.numberFormat(this.y, 2);                         
+	            }  
+	        },	        
+	        plotOptions: {
+	            spline: {
+	                lineWidth: 1,
+	                states: {
+	                    hover: {
+	                        lineWidth: 2
+	                    }
+	                },
+	                marker: {
+	                    enabled: false
+	                },
+	                pointInterval: 1000, // one hour
+	                pointStart: Date.UTC({:$data['hourly']['start_time_tmp']['year']}, 
+	                		{:$data['hourly']['start_time_tmp']['mon']}, 
+	                		{:$data['hourly']['start_time_tmp']['day']}, 
+	                		{:$data['hourly']['start_time_tmp']['hour']}, 
+	                		{:$data['hourly']['start_time_tmp']['min']}, 
+	                		{:$data['hourly']['start_time_tmp']['sec']})
+	            }
+	        },
+	        series: [{:$data['hourly']['series']}]
+	    });
+	    
+	    $('#container_dayly').highcharts({
+	    	chart: {
+	            type: 'spline'
+	        },
+	        title: {
+	            text: "{:$data['dayly']['title']}"
+	        },
+	        subtitle: {
+	            text: ''
+	        },
+	        xAxis: {
+	        	type: 'datetime'
+	        },	        
+	        yAxis: {
+	        	min:0,
+	            title: {
+	                text: "{:$data['dayly']['y_title']}"
+	            },
+		        labels: {
+	                formatter: function() {
+	                    return this.value + "{:$data['dayly']['Suffix']}"
+	                }
+	            }
+	        },
+	        tooltip: { 
+	        	valueSuffix:"{:$data['dayly']['Suffix']}",                                              
+	            formatter: function() {                                             
+	                    return '<b>'+ this.series.name +'</b><br/>'+                
+	                    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
+	                    Highcharts.numberFormat(this.y, 2);                         
+	            }  
+	        },
+	        plotOptions: {
+	            spline: {
+	                lineWidth: 1,
+	                states: {
+	                    hover: {
+	                        lineWidth: 2
+	                    }
+	                },
+	                marker: {
+	                    enabled: false
+	                },
+	                pointInterval: 300000, // one day
+	                pointStart: Date.UTC({:$data['dayly']['start_time_tmp']['year']}, 
+	                		{:$data['dayly']['start_time_tmp']['mon']}, 
+	                		{:$data['dayly']['start_time_tmp']['day']}, 
+	                		{:$data['dayly']['start_time_tmp']['hour']}, 
+	                		{:$data['dayly']['start_time_tmp']['min']}, 
+	                		{:$data['dayly']['start_time_tmp']['sec']})
+	            }
+	        },
+	        series: [{:$data['dayly']['series']}]
+	    });
+	    
+	    $('#container_monthly').highcharts({
+	    	chart: {
+	            type: 'spline'
+	        },
+	        title: {
+	            text: "{:$data['monthly']['title']}"
+	        },
+	        subtitle: {
+	            text: ''
+	        },
+	        xAxis: {
+	        	type: 'datetime'
+	        },	        
+	        yAxis: {
+	        	min:0,
+	            title: {
+	                text: "{:$data['monthly']['y_title']}"
+	            },
+		        labels: {
+	                formatter: function() {
+	                    return this.value + "{:$data['monthly']['Suffix']}"
+	                }
+	            }
+	        },
+	        tooltip: { 
+	        	valueSuffix:"{:$data['monthly']['Suffix']}",                                              
+	            formatter: function() {                                             
+	                    return '<b>'+ this.series.name +'</b><br/>'+                
+	                    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
+	                    Highcharts.numberFormat(this.y, 2);                         
+	            }  
+	        },
+	        plotOptions: {
+	            spline: {
+	                lineWidth: 1,
+	                states: {
+	                    hover: {
+	                        lineWidth: 2
+	                    }
+	                },
+	                marker: {
+	                    enabled: false
+	                },
+	                pointInterval: 3600000, // one day
+	                pointStart: Date.UTC({:$data['monthly']['start_time_tmp']['year']}, 
+	                		{:$data['monthly']['start_time_tmp']['mon']}, 
+	                		{:$data['monthly']['start_time_tmp']['day']}, 
+	                		{:$data['monthly']['start_time_tmp']['hour']}, 
+	                		{:$data['monthly']['start_time_tmp']['min']}, 
+	                		{:$data['monthly']['start_time_tmp']['sec']})
+	            }
+	        },
+	        series: [{:$data['monthly']['series']}]
+	    });
+	});
+</script>
+</body>
+</html>

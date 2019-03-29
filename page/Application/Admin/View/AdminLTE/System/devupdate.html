@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title> {$action} | {:C('WRT_TITLE')}</title>
+
+    <include file="Public:head"/>
+
+</head>
+<body class="skin-blue">
+
+{:W('Common/header')}
+
+
+
+<div class="wrapper row-offcanvas row-offcanvas-left">
+    {:W('Common/sideMenu')}
+
+
+    <!-- Right side column. Contains the navbar and content of the page -->
+    <aside class="right-side">
+        <!-- Content Header (Page header) -->
+
+
+        <section class="content-header">
+            <h1>
+                {$action}
+                <small>{$Think.config.title}</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="{$module_url}"><i class="fa fa-dashboard"></i> {$module}</a></li>
+                <li class="active">{$action}</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box box-warning">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                        	<!-- BEGIN EXAMPLE TABLE PORTLET-->       
+
+                           <form action="{:U('Admin/System/devupdateSave')}"
+                               class="form-horizontal" method="post" id="devupdate_form">
+							
+                               		
+                            <div class="form-group-list">
+                                <div class="controls">
+								    <label class="control-label" >设备版本号：</label>
+                                	<input type="text" class="form-control middle" name="version" value="{$data['version']}" readonly="readonly" size=50/>
+                                    <a title='发布路由器最新版本'  
+									    href="{:U('Admin/System/devUpdateFile', array('dev_type' => 'router'))}" target="dialog" mask="true">
+									    <label style="color:blue;text-decoration: underline;cursor: pointer;">
+									       【发布设备版本】
+									    </label>
+									</a>
+                                </div>
+								&nbsp;
+								
+								<!--
+                                <div class="controls">
+								    <label class="control-label">x86版本号：</label>
+                                	<input type="text"class="form-control large" name="x86_version" value="{$data['x86_version']}" readonly="readonly" size=50/>
+                                    <a title='发布x86最新版本'  
+									    href="{:U('Admin/System/devUpdateFile', array('dev_type' => 'x86'))}" target="dialog" mask="true">
+									    <label style="color:blue;text-decoration: underline;cursor: pointer;">
+									       【发布x86版本】
+									    </label>
+									</a>
+                                </div>
+								&nbsp;
+								-->
+								
+							    <div class="controls">
+								    <label class="control-label">是否自动升级：</label>
+				                    <label style='width:50px'><input <?php if(0==$data['auto_update_enable']){ echo 'checked';} ?> type="radio" name="auto_update_enable"  value="0" />否</label>
+				                    <label style='width:50px'><input  <?php if( 1==$data['auto_update_enable']){ echo 'checked';} ?>  type="radio" name="auto_update_enable"   value="1"/>是</label>
+                                </div>
+								&nbsp;
+								
+								<div class="controls">
+								    <label class="control-label">同时升级的设备数量：</label>
+                                    <input type='text' class="form-control middle" value="{$data['upgrade_limit']}"
+					               name='upgrade_limit' size=50 />台
+                                </div>
+								&nbsp;
+								
+								<div class="controls">
+								    <label class="control-label">自动升级时间：</label>
+   				                    <label class="control-label" style='width:20px'>从&nbsp;&nbsp;</label>
+				                    <select class="control-label" name="start_hour" style='width:80px'>
+				                    	<option value="">请选择</option>
+				                    	<?php for($i=0;$i<=23;$i++){ ?>
+				                    		<option  <?php if($i == $data['start_hour']) echo 'selected';?> value="<?php echo $i;?>"><?php echo $i;?></option> 
+				                    	<?php } ?>
+				                    </select>
+				                    <label class="control-label" style='width:35px'>时 到 </label>
+				                    <select class="control-label" name="end_hour" style='width:80px' >
+				                    	<option value="">请选择</option>
+				                    	<?php for($j=0;$j<=23;$j++){?>
+				                    		<option  <?php if($j == $data['end_hour']) echo 'selected';?>   value="<?php echo $j;?>"><?php echo $j;?></option> 
+				                    	<?php } ?>
+				                    </select>
+				                    <label class="control-label" style='width:10px'>时 </label>
+                                </div>
+								&nbsp;&nbsp;
+								
+															
+                           	</div>			
+							&nbsp;
+                           	<div class="form-actions">
+                                <button type="submit" class="btn btn-info submit">确定</button>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- /.content -->
+    </aside>
+    <!-- /.right-side -->
+</div>
+<!-- ./wrapper -->
+
+<include file="Public:foot"/>
+<script type="text/javascript">
+</body>
+</html>

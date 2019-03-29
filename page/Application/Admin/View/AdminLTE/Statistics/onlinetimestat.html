@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title> {$action} | {:C('WRT_TITLE')}</title>
+
+    <include file="Public:head"/>
+
+</head>
+<body class="skin-blue">
+
+{:W('Common/header')}
+
+<div class="wrapper row-offcanvas row-offcanvas-left">
+    {:W('Common/sideMenu')}
+
+
+    <!-- Right side column. Contains the navbar and content of the page -->
+    <aside class="right-side">
+        <!-- Content Header (Page header) -->
+
+
+        <section class="content-header">
+            <h1>
+                {$action}
+                <small>{$Think.config.title}</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="{$module_url}"><i class="fa fa-dashboard"></i> {$module}</a></li>
+                <li class="active">{$action}</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+
+            <div class="row">
+			
+			<div class="col-md-12">
+                    <div class="box box-warning">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+							<form method="POST" action="{:U('Admin/Statistics/Onlinetimestat')}" id="posts">
+								<div class="portlet-body">
+                                   <div class="row">
+                                        <div class="col-md-12 margin">
+                                            <input type="text" name="device_mac" 
+	                                      	size="17" 
+	                                      	placeholder="设备mac" value="{:I('device_mac')}"> 
+                                            &nbsp;&nbsp;
+	                                        <input type="text" name="start_time" 
+	                                      	id="countTimestart" onfocus="selecttime(1)" 
+	                                      	size="17" class="date" readonly 
+	                                      	placeholder="起始时间" value="{:I('start_time')}"> 
+	                                      	- 
+	                                      	<input type="text" name="end_time" 
+	                                      	id="countTimeend" onfocus="selecttime(2)" 
+	                                      	size="17"  class="date" readonly  
+	                                      	placeholder="结束时间" value="{:I('end_time')}">
+
+	                                     	&nbsp;&nbsp;
+	                                     	<button type="submit" class="btn" name="search" value='1'>查询 </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+				
+                <div class="col-md-12">
+                    <div class="box box-warning">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+
+
+                            <h4>{$listname}列表</h4>
+                            <!-- BEGIN EXAMPLE TABLE PORTLET-->
+
+                            <table
+                                    class="table table-striped table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <th>序号</td>
+                                    <th>设备mac</td>
+                                    <th>商店名称</td>
+                                    <th>用户mac</td>
+                                    <th>上线时间</td>
+                                    <th>下线时间</td>
+                                    <th>在线时长(时：分：秒)</td>
+                                </tr>
+                                </thead>
+                                <volist name="list" id="vo">
+									<tr aid="{$vo.id}">
+                                        <td><?=$i?></td>
+                                        <td>{$vo.device_mac}</td>
+                                        <td>{$vo.shop_name}</td>
+                                        <td>{$vo.mac}</td>
+                                        <td>{$vo.online_time}</td>
+                                        <td>{$vo.offline_time_show}</td>
+                                        <td>{$vo.online}</td>
+                                    </tr>
+                                </volist>
+                            </table>
+			    			<div class="pagination">
+                                <ul class="pagination inline"> {$pager_bar}</ul>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </section>
+        <!-- /.content -->
+    </aside>
+    <!-- /.right-side -->
+</div>
+<!-- ./wrapper -->
+
+<include file="Public:foot"/>
+<script type="text/javascript" src="__PUBLIC__/AdminLTE/js/My97DatePicker/WdatePicker.js"></script>
+<script type="text/javascript">
+ //时间选择
+ function selecttime(flag){
+    if(flag==1){
+        var endTime = $("#countTimeend").val();
+        if(endTime != ""){
+            WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:endTime});
+        }else{
+            WdatePicker({dateFmt:'yyyy-MM-dd'});
+        }
+    }else{
+        var startTime = $("#countTimestart").val();
+        if(startTime != ""){
+            WdatePicker({dateFmt:'yyyy-MM-dd',minDate:startTime});
+        }else{
+            WdatePicker({dateFmt:'yyyy-MM-dd'});
+        }    
+    }
+ }
+ </script>
+</body>
+</html>

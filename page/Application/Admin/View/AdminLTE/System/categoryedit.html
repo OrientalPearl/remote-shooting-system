@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title> {$action} | {:C('WRT_TITLE')}</title>
+
+    <include file="Public:head"/>
+
+</head>
+<body class="skin-blue">
+
+{:W('Common/header')}
+
+
+
+<div class="wrapper row-offcanvas row-offcanvas-left">
+    {:W('Common/sideMenu')}
+
+
+    <!-- Right side column. Contains the navbar and content of the page -->
+    <aside class="right-side">
+        <!-- Content Header (Page header) -->
+
+
+        <section class="content-header">
+            <h1>
+                {$action}
+                <small>{$Think.config.title}</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="{$module_url}"><i class="fa fa-dashboard"></i> {$module}</a></li>
+                <li class="active">{$action}</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+
+            <div class="row">
+                <div class="col-md-10">
+                    <div class="box box-warning">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                        	<!-- BEGIN EXAMPLE TABLE PORTLET-->       
+                           	<switch name="action_name">
+	                         <case value="add">
+                           <form action="{:U('Admin/System/categoryAddHandle')}"
+                               class="form-horizontal" method="post" id="category_form">
+							 </case>
+	                        <default/>
+                           <form action="{:U('Admin/System/categoryEditHandle')}"
+                               class="form-horizontal" method="post" id="category_form">
+	                       </switch>							
+                               
+                            <input type="text" style="display:none" name="id" value="{$id}"/>
+                            
+                            <div class="form-group">
+                            	<label class="control-label">行业名称：</label>
+
+                                <div class="controls">
+                                	<input type="text"class="form-control large"
+                                    	name="category" value="{$category}"/>
+
+                                </div>
+                           	</div>
+
+                           	<div class="form-actions">
+
+                                <button type="submit" class="btn btn-info submit">
+	                               	<switch name="action_name">
+	                                  <case value="add">添加</case>
+	                                	<default/>修改
+	                                </switch>
+    							              </button>
+    							              
+                              	<a href="{:U('Admin/System/category')}" class="btn btn-info" id="button"><i
+                                	class="icon-ok"></i>
+                                  返回
+								                </a>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- /.content -->
+    </aside>
+    <!-- /.right-side -->
+</div>
+<!-- ./wrapper -->
+
+<include file="Public:foot"/>
+<script type="text/javascript">
+</body>
+</html>

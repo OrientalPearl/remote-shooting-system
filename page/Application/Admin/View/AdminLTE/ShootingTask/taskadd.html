@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title> {$action} | {:C('WRT_TITLE')}</title>
+
+    <include file="Public:head"/>
+
+</head>
+<body class="skin-blue">
+
+{:W('Common/header')}
+
+<div class="wrapper row-offcanvas row-offcanvas-left">
+    {:W('Common/sideMenu')}
+
+
+    <!-- Right side column. Contains the navbar and content of the page -->
+    <aside class="right-side">
+        <!-- Content Header (Page header) -->
+
+
+        <section class="content-header">
+            <h1>
+                {$action}
+                <small>{$Think.config.title}</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="{$module_url}"><i class="fa fa-dashboard"></i> {$module}</a></li>
+                <li class="active">{$action}</li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="row">
+                <div class="col-md-10">
+                    <div class="box box-warning">
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                        	<!-- BEGIN EXAMPLE TABLE PORTLET-->
+                            <switch name="action_name">
+                            	<case value="editTask">
+                                	<form action="{:U('Admin/ShootingTask/taskEditHandle')}"
+                                    	class="form-horizontal" id="newtask" method="post">
+                                    </case>
+                                    
+                                    <default/>
+                                    <form action="{:U('Admin/ShootingTask/taskAddHandle')}"
+                                          class="form-horizontal" id="newtask" method="post">
+                            </switch>
+  
+  
+							<input type="hidden" name="id" value="{:$info['id']}"/>
+							
+                            <div class="form-group">
+                            	<label class="control-label">序列号 ：</label>
+								   <switch name="action_name">
+			                         	<case value="addTask">                                	
+											<div class="controls">
+												<select id="serial" name="serial" <!--</select>onclick="change_serial()"--> class="large form-control" tabindex="1" >
+													<option value="">请选择设备序列号 </option>
+													<volist name="list_device" id="vo">
+														<option value={$vo.serial} <if condition="$info.serial eq $vo['serial']"> selected </if>>{$vo.serial}</option>
+													</volist>
+												</select>
+											</div>
+			                            </case>
+			                            	
+			                            <default/>                   
+											<input type="hidden" name="serial" value="{:$info['serial']}"/>										
+											<div class="controls">
+												<select id="serial" name="serial" <!--onclick="change_serial()"--> disabled="disabled" class="large form-control" tabindex="1" >
+													<option value="">请选择设备序列号 </option>
+													<volist name="list_device" id="vo">
+														<option value={$vo.serial} <if condition="$info.serial eq $vo['serial']"> selected </if>>{$vo.serial}</option>
+													</volist>
+												</select>
+											</div>
+		                            </switch>
+									
+
+                           	</div> 
+							
+							<!--
+							
+                            <div class="form-group" style={$_SESSION[C('USER_AUTH_INFO')]['type']!=1?"display:none":""}>
+                            	<label class="control-label">管理员：</label>
+								   <switch name="action_name">
+			                         	<case value="addTask">                                	
+											<div class="controls">
+												<select id="user_id" name="user_id" class="large form-control" tabindex="1" >
+													<option value="">请选择管理员</option>
+													<volist name="list_user" id="vo">
+														<option value={$vo.id} <if condition="$info.user_id eq $vo['id']"> selected </if>>{$vo.name}</option>
+													</volist>
+												</select>
+											</div>			                            </case>
+			                            	
+			                            <default/>                                	
+											<div class="controls">
+												<select id="user_id" name="user_id" disabled="disabled" class="large form-control" tabindex="1" >
+													<option value="">请选择管理员</option>
+													<volist name="list_user" id="vo">
+														<option value={$vo.id} <if condition="$info.user_id eq $vo['id']"> selected </if>>{$vo.name}</option>
+													</volist>
+												</select>
+											</div>		                            
+								</switch>
+
+                           	</div> 
+							-->
+							
+							
+							<div class="form-group">
+                            	<label class="control-label">任务类型 ：</label>
+
+                           		<div class="controls">
+									<select name="type" id="type"  class="large form-control" tabindex="1">
+	                                    <option value="">选请择任务类型</option>
+		                                <option value="0" <if condition="$info.type eq '0'"> selected </if> > 自动任务 </option>
+										<option value="1" <if condition="$info.type eq '1'"> selected </if> > 手动任务 </option>
+		                            </select>
+							
+                                </div>
+                            </div>
+											
+							<div class="form-group" id="aperture_outer">
+                            	<label class="control-label">光圈 ：</label>
+
+                           		<div class="controls">
+									 <select id="aperture" name="aperture" class="large form-control" tabindex="1" >
+										<option value="">请选择光圈 </option>
+										<!--
+										<volist name="list_aperture" id="vo">
+											<option value={$vo.aperture} <if condition="$info.aperture eq $vo['aperture']"> selected </if>>{$vo.aperture}</option>
+										</volist>
+										-->
+		                              </select>
+								<!--
+								   <switch name="action_name">
+			                         	<case value="addTask">                                	
+										<input id="aperture" type="text" placeholder="光圈" class="form-control large" name="aperture"/>
+			                            </case>
+			                            	
+			                            <default/>                                	
+										<input id="aperture" type="text" class="form-control large" name="aperture" value="{:$info['aperture']}"/>
+		                            </switch>
+								-->
+                                </div>
+                            </div>
+							<div class="form-group" id="shutter_outer">
+                            	<label class="control-label">快门 ：</label>
+
+                           		<div class="controls">									 
+								
+									<select id="shutter" name="shutter" class="large form-control" tabindex="1" >
+										<option value="">请选择快门 </option>
+										<!--
+										<volist name="list_shutter" id="vo">
+											<option value={$vo.shutter} <if condition="$info.shutter eq $vo['shutter']"> selected </if>>{$vo.shutter}</option>
+										</volist>
+										-->
+		                              </select>
+									<!--
+								   <switch name="action_name">
+			                         	<case value="addTask">                                	
+										<input id="shutter" type="text" placeholder="快门" class="form-control large" name="shutter"/>
+			                            </case>
+			                            	
+			                            <default/>                                	
+										<input id="shutter" type="text" class="form-control large" name="shutter" value="{:$info['shutter']}"/>
+		                            </switch>
+									-->
+                                </div>
+                            </div>
+							<div class="form-group" id="iso_outer">
+                            	<label class="control-label">ISO ：</label>
+
+                           		<div class="controls">									
+								
+									<select id="iso" name="iso" class="large form-control" tabindex="1" >
+										<option value="">请选择ISO </option>
+										<!--
+										<volist name="list_iso" id="vo">
+											<option value={$vo.iso} <if condition="$info.iso eq $vo['iso']"> selected </if>>{$vo.iso}</option>
+										</volist>
+										-->
+		                              </select>
+									<!--
+								   <switch name="action_name">
+			                         	<case value="addTask">                                	
+										<input id="iso" type="text" placeholder="ISO" class="form-control large" name="iso"/>
+			                            </case>
+			                            	
+			                            <default/>                                	
+										<input id="iso" type="text" class="form-control large" name="iso" value="{:$info['iso']}"/>
+		                            </switch>
+									-->
+                                </div>
+                            </div>
+							<div class="form-group">
+                            	<label class="control-label">拍摄时间 ：</label>
+
+                           		<div class="controls">
+								   <switch name="action_name">
+			                         	<case value="addTask">                                	
+										<input id="shooting_time" type="text" placeholder="拍摄时间" class="form-control large" name="shooting_time"/>
+			                            </case>
+			                            	
+			                            <default/>                                	
+										<input id="shooting_time" type="text" class="form-control large" name="shooting_time" value="{:$info['shooting_time']}"/>
+		                            </switch>
+									
+                                </div>
+                            </div>							
+							<div class="form-group">
+                            	<label class="control-label">拍摄张数 ：</label>
+
+                           		<div class="controls">
+								   <switch name="action_name">
+			                         	<case value="addTask">                                	
+										<input id="shooting_number" type="text" placeholder="拍摄张数" class="form-control large" name="shooting_number"/>
+			                            </case>
+			                            	
+			                            <default/>                                	
+										<input id="shooting_number" type="text" class="form-control large" name="shooting_number" value="{:$info['shooting_number']}"/>
+		                            </switch>
+
+                                </div>
+                            </div>							
+							<div class="form-group">
+                            	<label class="control-label">拍摄间隔 ：</label>
+
+                           		<div class="controls">
+								   <switch name="action_name">
+			                         	<case value="addTask">                                	
+										<input id="shooting_interval" type="text" placeholder="拍摄间隔" class="form-control large" name="shooting_interval"/>
+			                            </case>
+			                            	
+			                            <default/>                                	
+										<input id="shooting_interval" type="text" class="form-control large" name="shooting_interval" value="{:$info['shooting_interval']}"/>
+		                            </switch>
+
+                                </div>
+                            </div>
+							
+                           	<div class="form-actions">
+
+	                               	<switch name="action_name">
+	                                	<case value="editTask">
+											<a href="javascript:;" class="btn btn-info" id="button_edit"><i
+												class="icon-ok"></i>
+											修改</case>
+	                                    <case value="addTask">
+											<a href="javascript:;" class="btn btn-info" id="button_add"><i
+												class="icon-ok"></i>
+											添加</case>
+	                                	<default/>
+											添加
+	                                </switch>
+                               	</a>
+                                    
+                                &nbsp;&nbsp;
+                                    
+                                <a href="{:U('Admin/ShootingTask/task')}" class="btn btn-info" id="button"><i
+                                	class="icon-ok"></i>
+                                    	返回
+								</a>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- /.content -->
+    </aside>
+    <!-- /.right-side -->
+</div>
+<!-- ./wrapper -->
+
+<include file="Public:foot"/>
+
+<style type="text/css">
+	em.error {
+		background:url("__PUBLIC__/share/img/unchecked.gif") no-repeat 4px 4px;
+		padding-left: 20px;
+	}
+
+	em.error { color: red; }
+</style>
+<script type="text/javascript">
+
+$('#serial').change(function(){ 
+	var i;
+	//var options=$("#serial option:selected");
+	var serial = $(this).children('option:selected').val();
+
+	//console.log(options);
+
+	//console.log(serial);
+	
+	if (!serial){
+		$("#aperture").empty();
+		var b = '<option value="">请选择光圈</option>';
+		$("#aperture").append(b);
+		
+		$("#shutter").empty();
+		var b = '<option value="">请选择快门</option>';
+		$("#shutter").append(b);
+		
+		$("#iso").empty();
+		var b = '<option value="">请选择ISO</option>';
+		$("#iso").append(b);
+		return;
+	}
+	
+	
+	var json_aperture_str = '{$list_json_aperture}';
+	var aperture_str = eval('(' + json_aperture_str + ')')[serial];
+	var aperture_arr = aperture_str.split(',')
+	var current_aperture = '{$info.aperture}'
+	
+	$("#aperture").empty();
+	
+	var b = '<option value="">请选择光圈</option>';
+	for (i = 0;i < aperture_arr.length; i++){
+		if (aperture_arr[i] == current_aperture)
+			b+="<option selected value='"+aperture_arr[i]+"'>"+aperture_arr[i]+"</option>";
+		else
+			b+="<option value='"+aperture_arr[i]+"'>"+aperture_arr[i]+"</option>";
+	}
+
+    $("#aperture").append(b);
+	
+	
+	
+	
+	
+	
+	var json_shutter_str = '{$list_json_shutter}';
+	var shutter_str = eval('(' + json_shutter_str + ')')[serial];
+	var shutter_arr = shutter_str.split(',')
+	var current_shutter = '{$info.shutter}'
+	
+	$("#shutter").empty();
+	
+	var b = '<option value="">请选择快门</option>';
+	for (i = 0;i < shutter_arr.length; i++){
+		if (shutter_arr[i] == current_shutter)
+			b+="<option selected value='"+shutter_arr[i]+"'>"+shutter_arr[i]+"</option>";
+		else
+			b+="<option value='"+shutter_arr[i]+"'>"+shutter_arr[i]+"</option>";
+	}
+
+    $("#shutter").append(b);
+	
+	
+	
+	
+	
+	
+	var json_iso_str = '{$list_json_iso}';
+	var iso_str = eval('(' + json_iso_str + ')')[serial];
+	var iso_arr = iso_str.split(',')
+	var current_iso = '{$info.iso}'
+	
+	$("#iso").empty();
+	
+	var b = '<option value="">请选择ISO</option>';
+	for (i = 0;i < iso_arr.length; i++){
+		if (iso_arr[i] == current_iso)
+			b+="<option selected value='"+iso_arr[i]+"'>"+iso_arr[i]+"</option>";
+		else
+			b+="<option value='"+iso_arr[i]+"'>"+iso_arr[i]+"</option>";
+	}
+
+    $("#iso").append(b);
+	return;
+});
+	
+function change_serial(){
+	var i;
+	var options=$("#serial option:selected");
+	var serial = options.val();
+
+	console.log(options);
+
+	console.log(serial);
+	
+	if (!serial){
+		$("#aperture").empty();
+		var b = '<option value="">请选择光圈</option>';
+		$("#aperture").append(b);
+		
+		$("#shutter").empty();
+		var b = '<option value="">请选择快门</option>';
+		$("#shutter").append(b);
+		
+		$("#iso").empty();
+		var b = '<option value="">请选择ISO</option>';
+		$("#iso").append(b);
+		return;
+	}
+	
+	
+	var json_aperture_str = '{$list_json_aperture}';
+	var aperture_str = eval('(' + json_aperture_str + ')')[serial];
+	var aperture_arr = aperture_str.split(',')
+	var current_aperture = '{$info.aperture}'
+	
+	$("#aperture").empty();
+	
+	var b = '<option value="">请选择光圈</option>';
+	for (i = 0;i < aperture_arr.length; i++){
+		if (aperture_arr[i] == current_aperture)
+			b+="<option selected value='"+aperture_arr[i]+"'>"+aperture_arr[i]+"</option>";
+		else
+			b+="<option value='"+aperture_arr[i]+"'>"+aperture_arr[i]+"</option>";
+	}
+
+    $("#aperture").append(b);
+	
+	
+	
+	
+	
+	
+	var json_shutter_str = '{$list_json_shutter}';
+	var shutter_str = eval('(' + json_shutter_str + ')')[serial];
+	var shutter_arr = shutter_str.split(',')
+	var current_shutter = '{$info.shutter}'
+	
+	$("#shutter").empty();
+	
+	var b = '<option value="">请选择快门</option>';
+	for (i = 0;i < shutter_arr.length; i++){
+		if (shutter_arr[i] == current_shutter)
+			b+="<option selected value='"+shutter_arr[i]+"'>"+shutter_arr[i]+"</option>";
+		else
+			b+="<option value='"+shutter_arr[i]+"'>"+shutter_arr[i]+"</option>";
+	}
+
+    $("#shutter").append(b);
+	
+	
+	
+	
+	
+	
+	var json_iso_str = '{$list_json_iso}';
+	var iso_str = eval('(' + json_iso_str + ')')[serial];
+	var iso_arr = iso_str.split(',')
+	var current_iso = '{$info.iso}'
+	
+	$("#iso").empty();
+	
+	var b = '<option value="">请选择ISO</option>';
+	for (i = 0;i < iso_arr.length; i++){
+		if (iso_arr[i] == current_iso)
+			b+="<option selected value='"+iso_arr[i]+"'>"+iso_arr[i]+"</option>";
+		else
+			b+="<option value='"+iso_arr[i]+"'>"+iso_arr[i]+"</option>";
+	}
+
+    $("#iso").append(b);
+	return;
+	
+}
+
+$().ready(function() {
+
+  $("#newtask").validate({
+    errorElement: "em",
+	rules: {
+		serial: {
+			required: true
+		},
+		user_id: {
+			required: true
+		},		
+		type: {
+			required: true
+		},
+		aperture: {
+			required: true
+		},		
+		shutter: {
+			required: true
+		},		
+		iso: {
+			required: true
+		},
+		shooting_time: {
+			required: true,
+			maxlength: 16
+		},		
+		shooting_number: {
+			required: true,
+			maxlength: 16
+		},
+		shooting_interval: {
+			required: true,
+			maxlength: 16
+		}
+    },
+    messages: {		
+		serial: {
+			required: "请选择序列号"
+		},
+		user_id: {
+			required: "请选择管理员"
+		},
+		type: {
+			required: "请选择任务类型"
+		},
+		aperture: {
+			required: "请选择光圈"
+		},
+		shutter: {
+			required: "请选择快门"
+		},
+		iso: {
+			required: "请选择ISO"
+		},
+		shooting_time: {
+			required: "请输入拍摄时间",
+			maxlength: "拍摄时间必需小于16个字符"
+		},		
+		shooting_number: {
+			required: "请输入拍摄张数",
+			maxlength: "拍摄张数必需小于16个字符"
+		},		
+		shooting_interval: {
+			required: "请输入拍摄间隔",
+			maxlength: "拍摄间隔必需小于16个字符"
+		}
+    }
+    });
+	
+	
+	$("#button_add").click(function(){
+		if($("#newtask").valid()){
+			$("#newtask").submit();
+		}
+	});	
+	
+	$("#button_edit").click(function(){
+		if($("#newtask").valid()){
+			$("#newtask").submit();
+		}
+	});
+	
+	
+	change_serial();
+
+
+	$('#type').change(function(){ 
+		var p1 = $(this).children('option:selected').val();
+
+		if (p1 == "0") {
+			$("#aperture_outer").hide();
+			$("#shutter_outer").hide();
+			$("#iso_outer").hide();
+		} else if (p1 == "1"){
+			$("#aperture_outer").show();
+			$("#shutter_outer").show();
+			$("#iso_outer").show();
+		}
+	});
+	
+	if ($('#type').val() == "0") {
+		$("#aperture_outer").hide();
+		$("#shutter_outer").hide();
+		$("#iso_outer").hide();
+	} else if ($('#type').val() == "1"){
+		$("#aperture_outer").show();
+		$("#shutter_outer").show();
+		$("#iso_outer").show();
+	}
+	
+});
+
+laydate.render({
+	elem: '#shooting_time',
+	type: 'time'
+});
+
+</script>
+
+</body>
+</html>
