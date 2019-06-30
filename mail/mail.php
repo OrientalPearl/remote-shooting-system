@@ -56,13 +56,18 @@ else if ($argv[2] == 9)
 {
 	$event = '每日上传总量超过最大限制，照片已停止上传。';
 }
+else if ($argv[2] == 10)
+{
+	$event = '设备上线。';
+}
+else if ($argv[2] == 11)
+{
+	$event = '设备下线。';
+}
 else
 {
 	return -1;
 }
-
-$body="时间: ".date('Y-m-d H:i:s')."，装置序列号:".$argv[1]."，事件:".$event;
-
 
 //get from mysql
 $con = mysql_connect("localhost","root","123456");
@@ -81,6 +86,14 @@ $row = mysql_fetch_array($result_conf);
 $user_id = $row['user_id'];
 
 mysql_query("INSERT INTO `wrt_ysf_event_log` (`serial`,`user_id`,`event`) VALUES ('".$argv[1]."','".$user_id."','".$event."')");
+
+if ($argv[2] == 10 || $argv[2] == 11)
+{
+	mysql_close($con);
+	exit();
+}
+
+$body="时间: ".date('Y-m-d H:i:s')."，装置序列号:".$argv[1]."，事件:".$event;
 
 $result_conf = mysql_query("SELECT * FROM wrt_ysf_email");
   

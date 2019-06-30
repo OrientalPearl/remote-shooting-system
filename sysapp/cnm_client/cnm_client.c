@@ -46,6 +46,7 @@ char device_serial[32];
 char device_aperture_range[1024];
 char device_shutter_range[1024];
 char device_iso_range[1024];
+char server_user[128] = "root";
 char server_password[128] = "WUxiang906";
 char bwlimit_conf[128] = {0};
 
@@ -66,6 +67,7 @@ int ysf_status;
 int ysf_upload_status = 1;
 int ysf_upload_limit_day = 0;
 unsigned long long ysf_upload_size = 0;
+int ysf_upload_warnning = 0;
 time_t ysf_upload_check_time = 0;
 int ysf_upload_overflow = 0;
 int cnm_notify_upload_limit_day_warnning = 0;
@@ -364,7 +366,7 @@ int upload_size_init(void)
     if (!fp)
     {
         ysf_upload_check_time = time(NULL);
-        snprintf(buffer, sizeof(buffer)-1, "echo %u %llu  > %s",
+        snprintf(buffer, sizeof(buffer)-1, "echo %u %llu 0 > %s",
             ysf_upload_check_time, ysf_upload_size, YSF_UPLOAD_SIZE_FILE);
         system(buffer);
         return 0;
@@ -374,7 +376,7 @@ int upload_size_init(void)
 
     fclose(fp);
 
-    sscanf(buffer, "%u %llu", &ysf_upload_check_time, &ysf_upload_size);
+    sscanf(buffer, "%u %llu %u", &ysf_upload_check_time, &ysf_upload_size, &ysf_upload_warnning);
 
     log_cnm("ysf_upload_size %llu ysf_upload_check_time %u\n", ysf_upload_size, ysf_upload_check_time);
         
@@ -417,6 +419,7 @@ void upload_size_update(void)
         cnm_notify_upload_limit_day_warnning = 0;
         ysf_upload_check_time = now;
         last_record_size = 0;
+		ysf_upload_warnning = 0;
         update = 1;
     }
 
@@ -425,7 +428,7 @@ void upload_size_update(void)
         FILE *fp = fopen(YSF_UPLOAD_SIZE_FILE, "w+");
         if (fp)
         {
-            fprintf(fp, "%u %llu", ysf_upload_check_time, ysf_upload_size);
+            fprintf(fp, "%u %llu %u", ysf_upload_check_time, ysf_upload_size, ysf_upload_warnning);
             fclose(fp);
         }
     }
@@ -882,7 +885,7 @@ int send_preview_finish_to_server(void)
         return -1;
     }
 	
-    send_pkt->total_len += client_build_item(send_pkt->data, CNM_PREVIEW_SYNC_ACTION,
+    send_pkt->total_len += client_build_item(send_pkt->data, ysf_notify_preview_response == 4 ? CNM_PREVIEW_SYNC_ACTION : CNM_PREVIEW_SYNC_FAIL,
         CNM_RESOLVE_TYPE_BINARY, NULL, 0);  
 
     send_len = send_pkt->total_len + sizeof(send_pkt->total_len);
@@ -895,11 +898,13 @@ int send_preview_finish_to_server(void)
         pthread_mutex_unlock(&cent_sockfd_mutex);
 		return -1;
     }
+	
+	log_cnm("%s %d ysf_notify_preview_response %d\n", __FUNCTION__, __LINE__, ysf_notify_preview_response);
+	
     pthread_mutex_unlock(&cent_sockfd_mutex);
-    
+	cnm_notify_preview_success = 1;    
 	return 0;
 }
-
 
 int send_upload_warnning_to_server(void)
 {
@@ -1047,27 +1052,50 @@ void *preview_tasks(void *arg)
         ysf_system(__FUNCTION__, __LINE__, "mv -f /tmp/.preview.ini /home/ysf/.camera/preview.ini");
 
         ysf_notify_preview_success = 0;
+		ysf_notify_preview_response = 0;
+		
+		log_cnm("%s %d send preview to ysf\n", __FUNCTION__, __LINE__);
         
         ysf_notify_preview();
     }
 
     ysf_notify_preview_response = 0;
-    while(!ysf_notify_preview_response)
+    while(ysf_notify_preview_response < 3)
+	{
+		log_cnm("%s %d check ysf_notify_preview_response %d\n", __FUNCTION__, __LINE__, ysf_notify_preview_response);
         sleep(1);
+	}
 
-    snprintf(cmd2, sizeof(cmd2)-1, "/usr/bin/sshpass -p %s rsync -auvzP "
-        " -e \"ssh -p 22 -o "
-        "StrictHostKeyChecking=no\" /tmp/preview.jpeg "
-        "%s:/%s/%s/preview/", 
-        server_password, 
-        SERVER_DOMAIN, CNM_SERVER_PHOTOS_PATH, 
-        device_serial);
+	if (ysf_notify_preview_response == 4)
+	{
+		snprintf(cmd2, sizeof(cmd2)-1, "/usr/bin/sshpass -p %s rsync -auvzP "
+			" -e \"ssh -p 22 -o "
+			"StrictHostKeyChecking=no\" /tmp/preview.jpeg "
+			"%s@%s:/%s/%s/preview/", 
+			server_password, server_user,
+			SERVER_DOMAIN, CNM_SERVER_PHOTOS_PATH, 
+			device_serial);
 
-    if (0 == ysf_system(__FUNCTION__, __LINE__, cmd2))
-    {
-        cnm_notify_preview_success = 0;
-        send_preview_finish_to_server();
-    }
+		if (0 == ysf_system(__FUNCTION__, __LINE__, cmd2))
+		{
+			system("rm -rf /tmp/preview.jpeg");
+			cnm_notify_preview_success = 0;
+			send_preview_finish_to_server();
+		}
+		else
+		{
+			ysf_notify_preview_response = 3;
+			cnm_notify_preview_success = 0;
+			send_preview_finish_to_server();
+		}
+	}
+	else
+	{
+		log_cnm("%s %d ysf_notify_preview_response %d\n", __FUNCTION__, __LINE__, ysf_notify_preview_response);
+		
+		cnm_notify_preview_success = 0;
+		send_preview_finish_to_server();
+	}
 
     free(arg);
     return NULL;
@@ -1329,7 +1357,8 @@ void ysf_data_handle(struct ysf_msg_header_t *hdr, char *data, int len)
         }
         else if (hdr->reason == 0x05)
         {
-            ysf_notify_preview_response = 1;
+			log_cnm("%s %d recv preview to ysf\n", __FUNCTION__, __LINE__);
+            ysf_notify_preview_response = 4;
         }
         break;
     case 0x04:
@@ -1532,10 +1561,11 @@ void *ysf_rsync_photo(void *arg)
                 snprintf(cmd, sizeof(cmd)-1, "/usr/bin/sshpass -p %s rsync -auvzP "
                     "%s -e \"ssh -p 22 -o "
                     "StrictHostKeyChecking=no\" %s "
-                    "%s:/%s/%s/raw/", 
+                    "%s@%s:/%s/%s/raw/", 
                     server_password, 
                     bwlimit_conf,
                     cipherFile, 
+					server_user,
                     SERVER_DOMAIN, CNM_SERVER_PHOTOS_PATH, 
                     device_serial);
 
@@ -1543,6 +1573,32 @@ void *ysf_rsync_photo(void *arg)
 
                 if (0 == ysf_system(__FUNCTION__, __LINE__, cmd))
                 {
+					struct stat st ;     
+                    stat(cipherFile, &st);
+
+                    ysf_upload_size += st.st_size;
+
+                    //log_cnm("%s %d %s %llu\n", __FUNCTION__, __LINE__,cipherFile, ysf_upload_size);
+
+                    if (ysf_upload_limit_day > 0)
+                    {
+                        if ((ysf_upload_size / 1024 / 1024) > ysf_upload_limit_day)
+                        {
+                            ysf_upload_overflow = 1;
+							if (!ysf_upload_warnning)
+								cnm_notify_upload_limit_day_warnning = 1;
+                        }
+                    }
+					remove(cipherFile);
+					count++;
+					
+					int len = strlen(entry->d_name);
+					if (len <= 3)
+						continue;
+					
+					if (!strcmp(&entry->d_name[len - 3], ".ok"))
+						continue;
+					
                     snprintf(ciperOkFile, 255, "%s/%s.ok", CNM_CLIENT_PHOTOS_PATH, entry->d_name);
         			snprintf(cmd, 255, "touch %s", ciperOkFile);
 
@@ -1551,31 +1607,15 @@ void *ysf_rsync_photo(void *arg)
                         snprintf(cmd, sizeof(cmd)-1, "/usr/bin/sshpass -p %s rsync -auvzP "
                             "-e \"ssh -p 22 -o "
                             "StrictHostKeyChecking=no\" "
-                            "%s %s:/%s/%s/raw/", 
+                            "%s %s@%s:/%s/%s/raw/", 
                             server_password, ciperOkFile,
+							server_user,
                             SERVER_DOMAIN, CNM_SERVER_PHOTOS_PATH, 
                             device_serial);
                     
                         if (0 == ysf_system(__FUNCTION__, __LINE__, cmd))
                         {
-                            struct stat st ;     
-                            stat(cipherFile, &st);
-
-                            ysf_upload_size += st.st_size;
-
-                            //log_cnm("%s %d %s %llu\n", __FUNCTION__, __LINE__,cipherFile, ysf_upload_size);
-
-                            if (ysf_upload_limit_day > 0)
-                            {
-                                if ((ysf_upload_size / 1024 / 1024) > ysf_upload_limit_day)
-                                {
-                                    ysf_upload_overflow = 1;
-                                    cnm_notify_upload_limit_day_warnning = 1;
-                                }
-                            }
-                            
                             remove(ciperOkFile);
-                            remove(cipherFile);
                         }
 
                         count++;
@@ -1648,6 +1688,13 @@ void recv_data_handle(char *data, int len)
         case CNM_UPLOAD_LIMIT_DAY_WARNNING_RESPONSE:
             {
                 cnm_notify_upload_limit_day_warnning = 0;
+				ysf_upload_warnning = 1;
+				FILE *fp = fopen(YSF_UPLOAD_SIZE_FILE, "w+");
+				if (fp)
+				{
+					fprintf(fp, "%u %llu %u", ysf_upload_check_time, ysf_upload_size, ysf_upload_warnning);
+					fclose(fp);
+				}
             }
             break;
 
@@ -1708,10 +1755,21 @@ void recv_data_handle(char *data, int len)
                 ysf_upload_status = tmp->upload_status;
                 ysf_upload_limit_day = tmp->upload_limit_day;
                 memset(server_password, 0, sizeof(server_password));
-                strncpy(server_password, tmp->passwd, sizeof(server_password));
+				
+				char *p = strstr(tmp->passwd, "@");
+				if (p)
+				{
+					memset(server_user, 0, sizeof(server_user));
+					strncpy(server_user, tmp->passwd, p - tmp->passwd);
+					strncpy(server_password, p+1, sizeof(server_password)-1);
+				}
+				else
+				{
+					strncpy(server_password, tmp->passwd, sizeof(server_password) - 1);
+				}
 
-                log_cnm("%s %d bwlimit %s server_password %s upload_status %d upload_limit_day %d\n",
-                    __FUNCTION__, __LINE__, bwlimit_conf, server_password, ysf_upload_status, ysf_upload_limit_day);
+                log_cnm("%s %d bwlimit %s server_user %s server_password %s upload_status %d upload_limit_day %d\n",
+                    __FUNCTION__, __LINE__, bwlimit_conf, server_user, server_password, ysf_upload_status, ysf_upload_limit_day);
                 cnm_conf_init_success = 1;
             }
             break;
@@ -1928,6 +1986,8 @@ void client_timer_heardbeat(char *status)
         CNM_DATA_TYPE_ISO_RANGE, device_iso_range, strlen(device_iso_range));
     data_len += tlv_put_item(send_data->data + data_len,
         CNM_DATA_TYPE_UPLOAD_STATUS, (char *)&ysf_upload_status, 4);
+	data_len += tlv_put_item(send_data->data + data_len,
+        CNM_DATA_TYPE_UPLOAD_TODAY, (char *)&ysf_upload_size, 4);	
 
     send_pkt->total_len = client_build_item(send_pkt->data, CNM_DEVICE_SYS_STAT_INFO,
         CNM_RESOLVE_TYPE_TLV, NULL, data_len);  
@@ -2063,6 +2123,11 @@ int main(int arg, char **argc)
             send_upload_warnning_to_server();
             upload_size_update();
             time_10s = 0;
+			if (ysf_notify_preview_response < 3)
+			{
+				log_cnm("%s %d ysf_notify_preview_response %d\n", __FUNCTION__, __LINE__, ysf_notify_preview_response);
+				ysf_notify_preview_response++;
+			}
         }
     }
 

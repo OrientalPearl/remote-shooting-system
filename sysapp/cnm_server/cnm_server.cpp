@@ -2051,6 +2051,11 @@ int parse_heardbeat_body(char *data, int data_len,
 				attr_string,
 				sizeof(result->temperature)-1);
         }
+		else if (CNM_DATA_TYPE_UPLOAD_TODAY == attr->attribute)
+        {
+        	result->today_used = *(unsigned int *)attr_string;
+			result->today_used = result->today_used  / 1024 / 1024;
+        }
 
 next_attr:
         attr = (CNM_ATTRIBUTE*)((char*) attr+attr->length);
@@ -2194,6 +2199,13 @@ int set_recv_data(const char* recv_data, u32 data_len,
                     //cnm_printf("%s %d CNM_PREVIEW_SYNC_ACTION\n", __FUNCTION__, __LINE__);
 					g_cnm_db->UpdatePreviewSyncedSeq(p_client->client_node.client_info.serial,
 						0, 2);
+                }
+                break;
+			case CNM_PREVIEW_SYNC_FAIL:
+                {
+                    //cnm_printf("%s %d CNM_PREVIEW_SYNC_ACTION\n", __FUNCTION__, __LINE__);
+					g_cnm_db->UpdatePreviewSyncedSeq(p_client->client_node.client_info.serial,
+						0, 3);
                 }
                 break;
 			case CNM_BWLIMIT_SYNC_RESPONSE:
@@ -2450,6 +2462,7 @@ start:
 		p_client->client_node.client_sid = client_sid;
         p_client->client_node.client_info.cc_ip = client_ip;
         p_client->client_node.client_time = time( NULL );
+		p_client->client_node.client_info.add_online_log = 1;
 
 	    if(0 != (ret = cnm_client_add(p_client)))
 	    {

@@ -1675,6 +1675,8 @@ int CnmDB::SetDeviceOffline(char *serial)
 	}while ( true );
 
 	UnLock();
+	
+	AddEvent(serial, "", 11);
 	return 0;
 }
 
@@ -1683,6 +1685,7 @@ int CnmDB::UpdateDevice(struct cnm_client_info *client_info)
 {
 	int   try_n = 1;
 	char version[sizeof("255.255.255.255")] = {0};
+	int create_dir = 0;
 
 	sprintf(version, "%d.%d.%d.%d",
 		client_info->version & 0xff,
@@ -1696,6 +1699,7 @@ int CnmDB::UpdateDevice(struct cnm_client_info *client_info)
 	if (access(conf, 0) != 0)
 	{
 		mkdir(conf, S_IRWXU);
+		create_dir = 1;
 	}
 
 	snprintf(conf, sizeof(conf)-1, "%s/%s", 
@@ -1704,6 +1708,7 @@ int CnmDB::UpdateDevice(struct cnm_client_info *client_info)
 	if (access(conf, 0) != 0)
 	{
 		mkdir(conf, S_IRWXU);
+		create_dir = 1;
 	}
 
 	snprintf(conf, sizeof(conf)-1, "%s/%s/raw", 
@@ -1712,6 +1717,7 @@ int CnmDB::UpdateDevice(struct cnm_client_info *client_info)
 	if (access(conf, 0) != 0)
 	{
 		mkdir(conf, S_IRWXU);
+		create_dir = 1;
 	}
 
 	snprintf(conf, sizeof(conf)-1, "%s/%s/jpg", 
@@ -1720,6 +1726,7 @@ int CnmDB::UpdateDevice(struct cnm_client_info *client_info)
 	if (access(conf, 0) != 0)
 	{
 		mkdir(conf, S_IRWXU);
+		create_dir = 1;
 	}
 
 	snprintf(conf, sizeof(conf)-1, "%s/%s/preview", 
@@ -1728,7 +1735,14 @@ int CnmDB::UpdateDevice(struct cnm_client_info *client_info)
 	if (access(conf, 0) != 0)
 	{
 		mkdir(conf, S_IRWXU);
+		create_dir = 1;
 	}
+	
+	if (create_dir)
+	{
+		sprintf(conf, "chmod 777 %s%s -R", CONF_BASE_PATH, client_info->serial);
+		system(conf);
+	}	
 
 	if (false == CheckConnection())
 		return -1;
@@ -1753,6 +1767,7 @@ int CnmDB::UpdateDevice(struct cnm_client_info *client_info)
 			<< " ,`temperature`='" << client_info->temperature << "'"
 			<< " ,`camera_connection`=" << client_info->camera_connection
 			<< " ,`version`='" << version << "'"
+			<< " ,`day_flow_used`='" << client_info->today_used << "M'"
 			<< " ,`device_ip`=" << client_info->cc_ip
 			<< " ,`last_heardbeat_time`=date_format(now(), '%Y-%m-%d %H:%i:%s')"
 			<< " WHERE `serial`='" << client_info->serial << "'";
@@ -1801,6 +1816,13 @@ int CnmDB::UpdateDevice(struct cnm_client_info *client_info)
 	}while ( true );
 
 	UnLock();
+	
+	if (client_info->add_online_log)
+	{
+		client_info->add_online_log = 0;
+		AddEvent(client_info->serial, "", 10);
+		
+	}
 	return 0;
 }
 

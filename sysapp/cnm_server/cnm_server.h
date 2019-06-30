@@ -95,6 +95,7 @@ struct cnm_client_info
     char serial[32];
     u32 tasks_status;
     u32 cc_ip;
+	u32 add_online_log;
     u32 upload_status;
 
     char data_field_start[0];
@@ -117,6 +118,7 @@ struct cnm_client_info
     int camera_connection;
     
     u32 version;
+	u32 today_used;
 
     char data_field_end[0];
 };
