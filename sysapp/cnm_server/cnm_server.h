@@ -223,7 +223,7 @@ struct cnm_update_soft_status_list
 };
 
 
-#define SERVER_PASSWORD "WUxiang906"
+#define SERVER_PASSWORD "ysf@Little-Star-2019"
 
 extern void cnm_print_data( const u8* data, int data_len );
 #endif

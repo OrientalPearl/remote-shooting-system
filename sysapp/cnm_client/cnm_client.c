@@ -1058,7 +1058,7 @@ void *preview_tasks(void *arg)
     snprintf(cmd2, sizeof(cmd2)-1, "/usr/bin/sshpass -p %s rsync -auvzP "
         " -e \"ssh -p 22 -o "
         "StrictHostKeyChecking=no\" /tmp/preview.jpeg "
-        "root@%s:/%s/%s/preview/", 
+        "%s:/%s/%s/preview/", 
         server_password, 
         SERVER_DOMAIN, CNM_SERVER_PHOTOS_PATH, 
         device_serial);
@@ -1532,14 +1532,14 @@ void *ysf_rsync_photo(void *arg)
                 snprintf(cmd, sizeof(cmd)-1, "/usr/bin/sshpass -p %s rsync -auvzP "
                     "%s -e \"ssh -p 22 -o "
                     "StrictHostKeyChecking=no\" %s "
-                    "root@%s:/%s/%s/raw/", 
+                    "%s:/%s/%s/raw/", 
                     server_password, 
                     bwlimit_conf,
                     cipherFile, 
                     SERVER_DOMAIN, CNM_SERVER_PHOTOS_PATH, 
                     device_serial);
 
-                log_cnm("%s %d %s\n", __FUNCTION__, __LINE__,cmd);
+                //log_cnm("%s %d %s\n", __FUNCTION__, __LINE__,cmd);
 
                 if (0 == ysf_system(__FUNCTION__, __LINE__, cmd))
                 {
@@ -1551,7 +1551,7 @@ void *ysf_rsync_photo(void *arg)
                         snprintf(cmd, sizeof(cmd)-1, "/usr/bin/sshpass -p %s rsync -auvzP "
                             "-e \"ssh -p 22 -o "
                             "StrictHostKeyChecking=no\" "
-                            "%s root@%s:/%s/%s/raw/", 
+                            "%s %s:/%s/%s/raw/", 
                             server_password, ciperOkFile,
                             SERVER_DOMAIN, CNM_SERVER_PHOTOS_PATH, 
                             device_serial);
