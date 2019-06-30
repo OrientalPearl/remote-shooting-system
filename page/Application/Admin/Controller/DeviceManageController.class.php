@@ -20,6 +20,40 @@ use Common\Logic\LogLogic;
  */
 class DeviceManageController extends AdminBaseController
 {	
+	private function getsize($size, $format = 'KB') 
+	{
+		$p = 0;
+		if ($format == 'KB') {
+			$p = 1;
+		} elseif ($format == 'MB') {
+			$p = 2;
+		} elseif ($format == 'GB') {
+			$p = 3;
+		}
+		$size /= pow(1024, $p);
+		return number_format($size, 3).$format;
+	}
+		
+	private function devGetDiskUsage($serial = '')
+	{
+		//$list = scandir("/mnt/photos/" . $serial);
+		//$list = glob("/mnt/photos/" . $serial . "/*.jpg");
+		$ret = 0;
+
+		$folder = "/mnt/photos/$serial/raw";
+		$cmd = "du -sh " . $folder . "|awk '{print $1}'";
+
+		exec($cmd, $output, $ret);
+		
+		//dump($output);
+		//dump($ret);
+		//exit;
+		
+		if ($ret == 0)
+			return $output[0];
+		
+	}
+
 	public function index()
 	{
 		$this->redirect('Admin/DeviceManage/devlist');
@@ -89,11 +123,19 @@ class DeviceManageController extends AdminBaseController
 		$list_user = M('ysf_user')->where($map_user)->select();
 		
 		$user = $_SESSION[C('USER_AUTH_INFO')];
+
+		//get disk usage
+		$list_final = array();
+		foreach ($list as $key=>$value) {
+			$value['disk_usage'] = $this->devGetDiskUsage($value['serial']);
+			$list_final[] = $value;
+		}
+		//print_r($list_final);
 		
         $this->assign('page', $page);
         $this->assign('listname', '设备');
         $this->assign('pager_bar', $pager_bar);
-        $this->assign('list', $list);
+        $this->assign('list', $list_final);
         $this->assign('total_count', $count);
         $this->assign('list_user', $list_user);
 		$this->assign('user', $user);
@@ -131,8 +173,8 @@ class DeviceManageController extends AdminBaseController
 	 	if ($serial != '')
 	 	{
 	 		$map['serial'] = $serial;
-		 }		
-		 
+		 }
+
 		 if ($cur_user_info['type'] != 1)
 		 	$map['user_id'] = $cur_user_info['id'];
 		 
@@ -143,7 +185,7 @@ class DeviceManageController extends AdminBaseController
 			 $Page = new GreenPage($count, $page); // 实例化分页类 传入总记录数
 			 $pager_bar = $Page->show();
 			 $limit = $Page->firstRow . ',' . $Page->listRows;
-			 $list = $Device->where($map)->limit($limit)->order('serial')->select();           
+			 $list = $Device->where($map)->limit($limit)->order('serial')->order('time desc')->select();           
 		 }
 
 	 	 
@@ -161,7 +203,9 @@ class DeviceManageController extends AdminBaseController
     public function deviceHandle()
     {    	
     	if (I('post.delAll') == 1) {
-            $post_ids = I('post.uid_chk_box');
+			$post_ids = I('post.uid_chk_box');
+			
+			//print_r($post_ids);exit;
 			
             $res_info = '';
             foreach ($post_ids as $post_id) {
@@ -237,7 +281,8 @@ class DeviceManageController extends AdminBaseController
 		);
 			
 		$device_db->add($data);
-			
+		//echo $device_db->_sql();
+		//exit;
 		LogLogic::addLog('新增设备 '.$serial);
 	
 		$this->success('新增成功', U('Admin/DeviceManage/devlist'));
@@ -299,7 +344,9 @@ class DeviceManageController extends AdminBaseController
 		if ($bwlimit != $old_dev[0]['bwlimit']) {
 			$data['bwlimit'] = $bwlimit;
 			$data['bwlimit_sync_seq'] = $old_dev[0]['bwlimit_sync_seq'] + 1;
-		} else if ($upload_limit_day != $old_dev[0]['upload_limit_day']){
+		}
+		
+		if ($upload_limit_day != $old_dev[0]['upload_limit_day']){
 
 			$data['upload_limit_day'] = $upload_limit_day;
 			$data['upload_limit_day_sync_seq'] = $old_dev[0]['upload_limit_day_sync_seq'] + 1;

@@ -39,12 +39,12 @@
                     <div class="box box-warning">
                         <!-- /.box-header -->
                         <div class="box-body">
-							<form method="POST" action="{:U('Admin/DeviceManage/deveventlogSearch')}" id="posts">
+							<form method="POST" action="{:U('Admin/DeviceManage/deveventlog')}" id="posts">
 								<div class="portlet-body">
                                    <div class="row">
                                         <div class="col-md-12 margin">
-	                                        <input type="text" name="search_serial" 
-	                                     		placeholder="序列号" value="{$_SESSION['search_field']['serial']}">
+	                                        <input type="text" name="search_devmac" 
+	                                     		placeholder="设备mac" value="{:I('get.search_devmac')}">
 			                                        	
 	                                     	<button title='查找' type="submit" name="search" class='btn' value='1'> 
 												<img height='18px' src="__PUBLIC__/AdminLTE/img/searchbtn.jpg"></button>
@@ -88,7 +88,7 @@
 		                                <thead>
 		                                <tr>
 		                                	<th>序号</td>
-		                                    <th>序列号</td>
+		                                    <th>设备mac</td>
 		                                    <th colspan="5">日志信息</td>
 		                                    <th>记录时间</td>
 		                                </tr>
@@ -96,9 +96,9 @@
 		                                <volist name="list" id="vo">
 		                                    <tr aid="{$vo.id}">
 		                                    	<td><?=$i?></td>
-		                                        <td>{$vo.serial}</td>
+		                                        <td>{$vo.device_mac}</td>
 		                                        <td colspan="5">{$vo.event}</td>
-		                                        <td>{$vo.time}</td>
+		                                        <td>{$vo.log_time}</td>
 		                                    </tr>
 		                                </volist>
 		                            </table>

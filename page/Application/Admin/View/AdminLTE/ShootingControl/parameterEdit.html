@@ -234,15 +234,25 @@
 
 function do_get_preview(){
 	var ret = 0;
-	var url_address = $("#preview_img_url").prop('href')
+	var url_address;
+	
+	url_address = $("#preview_img_url").prop('href')
 	$.ajax({
 		url: url_address,
 		type: "POST",
 		success: function(resp){
-			//console.log(resp);
-			$("#preview_img").attr("src", resp);
+			//console.log("success " + resp);
+			if (resp == "0") {
+				$("#preview_img").attr("alt", "预览失败");
+			}
+			else if (resp != ""){
+				$("#preview_img").attr("src", resp);
+			} else {
+				setTimeout(do_get_preview, 5000);
+			}
 		},
-		error : function(o){	
+		error : function(o){
+			//ajax_requesting = 0;
 			console.log(o);
 		}
 	})
@@ -250,7 +260,7 @@ function do_get_preview(){
 	return ret;
 }
 
-setInterval(do_get_preview, 6000);
+setTimeout(do_get_preview, 1000);
 
 $.validator.addMethod("aperture_min_not_null",function(value,element,params){
 	if($("#button_type").val() == "button_preview")
@@ -409,7 +419,7 @@ $().ready(function() {
 		}
 	});
 	
-	do_get_preview();
+	//do_get_preview();
 });
 
 </script>

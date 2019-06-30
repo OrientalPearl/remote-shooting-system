@@ -1699,7 +1699,6 @@ int CnmDB::UpdateDevice(struct cnm_client_info *client_info)
 	if (access(conf, 0) != 0)
 	{
 		mkdir(conf, S_IRWXU);
-		create_dir = 1;
 	}
 
 	snprintf(conf, sizeof(conf)-1, "%s/%s", 
@@ -1740,7 +1739,7 @@ int CnmDB::UpdateDevice(struct cnm_client_info *client_info)
 	
 	if (create_dir)
 	{
-		sprintf(conf, "chmod 777 %s%s -R", CONF_BASE_PATH, client_info->serial);
+		sprintf(conf, "chmod 777 %s/%s -R", CNM_SERVER_PHOTOS_PATH, client_info->serial);
 		system(conf);
 	}	
 

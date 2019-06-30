@@ -67,6 +67,7 @@ class PictureManageController extends AdminBaseController
 		//dump($folder);
 
 		$files = array();
+		$files_not_standard_format = array();
 		$handle = opendir($folder);
 		while (false !== ($file = readdir($handle))){
 			//dump($file);
@@ -80,7 +81,11 @@ class PictureManageController extends AdminBaseController
 					$rawfilename = str_replace('.jpeg', '.nef', $file);
 					$one['file_size'] = $this->getsize(filesize("/mnt/photos/$serial/raw/$rawfilename"));
 					$one['file_time'] = str_replace('.jpeg', '', $file);
-					$files[] = $one; 
+
+					if (5 != substr_count($one['file_time'], "-"))
+						$files_not_standard_format[] = $one; 
+					else
+						$files[] = $one; 
 				} else if ($hz == ".jpg"){					
 					$one['file_name'] = $file;
 					//$one['file_path'] = "/cms/Public/AdminLTE/img/pic/$serial/raw/$file";
@@ -89,11 +94,17 @@ class PictureManageController extends AdminBaseController
 					$rawfilename = str_replace('.jpg', '.nef', $file);
 					$one['file_size'] = $this->getsize(filesize("/mnt/photos/$serial/raw/$rawfilename"));
 					$one['file_time'] = str_replace('.jpg', '', $file);
-					$files[] = $one; 
+					
+					if (5 != substr_count($one['file_time'], "-"))
+						$files_not_standard_format[] = $one; 
+					else
+						$files[] = $one; 
 				}
 			}
 		}
-		
+		array_multisort(array_column($files,'file_time'), SORT_DESC, $files);
+		$files = array_merge($files, $files_not_standard_format);
+		//print_r($files);
 		//dump($files);exit;
 		return $files;
 	}
@@ -302,8 +313,10 @@ class PictureManageController extends AdminBaseController
 				$pathname = "/mnt/photos/$serial/jpg/$filename";
 				$rawpathname = "/mnt/photos/$serial/raw/$rawfilename";
 				exec("rm -f $pathname;rm -f $rawpathname", $output, $ret);
-				$this->pictureEdit($serial);
+				
 			}
+			$this->pictureEdit($serial);
+			//exit;
 		} else { //partial download
 			$tarfilename = $serial. ".tar.gz";
 			$tarpathname = "/mnt/photos/$serial/$tarfilename";

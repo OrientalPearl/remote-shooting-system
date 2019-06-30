@@ -149,9 +149,15 @@ class ShootingControlController extends AdminBaseController
 		
 		if ($type == "button_preview") {
 
+			//delete old preview
+			$this->deletePreview($serial);
+
+			//record current time
+			$this->recordPreviewTime($serial);
+
 			if ($old_dev[0]['status_preview'] == 1)
 			{
-				$this->error('设备'.$serial.'正在预览');
+				//$this->error('设备'.$serial.'正在预览');
 			}
 
 			$data = array (
@@ -273,11 +279,41 @@ class ShootingControlController extends AdminBaseController
 		
 		$base64_image = "";
 		$image_file = "/mnt/photos/$serial/preview/preview.jpeg";
-		
-		if (file_exists($image_file))
+		$time_file = "/mnt/photos/$serial/preview/preview.time";
+
+		if (file_exists($image_file)) {
 			$base64_image = $this->Base64EncodeImage($image_file);
+		}
+
+		if (file_exists($time_file)) {
+			$time_start = file_get_contents($time_file);
+			$time_now = mktime();
+
+			if ($time_now >= (3*60 + (int)$time_start)) {
+				echo "0";
+				exit;
+			}
+		}
 		
 		echo $base64_image;
 		exit;
+	}	
+	
+	private function deletePreview($serial = "")
+	{
+		if ($serial == "")
+			exit;
+		
+		$image_file = "/mnt/photos/$serial/preview/preview.jpeg";
+		unlink($image_file);
+	}	
+	
+	private function recordPreviewTime($serial = "")
+	{
+		if ($serial == "")
+			exit;
+		
+		$time_file = "/mnt/photos/$serial/preview/preview.time";
+		file_put_contents($time_file, mktime());
 	}
 }

@@ -144,7 +144,9 @@
 											<th>光圈</td>
 											<th>快门</td>
 											<th>ISO</td>
-											<th>市电状态</td>
+											<th>磁盘使用</td>
+											<th>当天流量</td>
+											<th>市电</td>
 											<th>温/湿度</td>
 											<th style={$user['type']==2?"display:none":""}>磁盘/带宽限制</th>
 											<th>状态</td>
@@ -153,7 +155,7 @@
 									</thead>
 									<volist name="list" id="vo">
 											<tr class="odd gradeX">
-                                                <td><input type="checkbox" class="checkboxes" value="{$vo.mac}"
+                                                <td><input type="checkbox" class="checkboxes" value="{:$vo['serial']}"
                                                            name="uid_chk_box[]"/>
                                                 </td>
 		                                        <td><?=$i?></td>
@@ -168,7 +170,9 @@
 		                                        <td>{$vo.aperture_current}</td>
 												<td>{$vo.shutter_current}</td>
 												<td>{$vo.iso_current}</td>
-		                                        <td>{$vo.electricity}</td>
+												<td>{$vo.disk_usage}</td>
+												<td>{$vo.day_flow_used}</td>
+		                                        <td><php>if ($vo['electricity'] != 0) {echo "正常";} else {echo "断开";}</php></td>
 		                                        
 		                                        <td><php>if ($vo['temperature']) {echo $vo['temperature'];} else {echo "-";}</php>/<php>if ($vo['humiture']) {echo $vo['humiture'];} else {echo "-";}</php></td>     
 												

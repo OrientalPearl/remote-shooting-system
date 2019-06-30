@@ -133,7 +133,7 @@
 												<td>{$vo.shutter_min}-{$vo.shutter_max}</td>
 
 												<td>{$vo.iso_min}-{$vo.iso_max}</td>		                                        
-												<td><php>if ($vo['status_preview'] == 0) {echo "无动作";} else if ($vo['status_preview'] == 1) {echo "正在生成";} else {echo "已生成";}</php></td>
+												<td><php>if ($vo['status_preview'] == 0) {echo "无动作";} else if ($vo['status_preview'] == 1) {echo "正在生成";} else if ($vo['status_preview'] == 2) {echo "已生成";} else {echo "生成失败";}</php></td>
 		                                        <td><php>if ($vo['tasks_status'] != 0) {echo "正常";} else {echo "停止";}</php></td>
 		                                        <td><php>if ($vo['device_ip'] != 0) {echo "在线";} else {echo "不在线";}</php></td>                                      
 												<td width='10%'>
