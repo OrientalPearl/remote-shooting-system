@@ -1791,8 +1791,12 @@ void *ysf_convert_photo(void *arg)
 					if (strcmp(&entry1->d_name[len - 3], ".ok"))
 						continue;
 
-					strncpy(ciperOkFile, entry1->d_name, strlen(entry1->d_name)-7);
+					strncpy(ciperOkFile, entry1->d_name, strlen(entry1->d_name)-3);
 					strncpy(ciperRawFile, entry1->d_name, strlen(entry1->d_name)-3);
+					
+					char *pdian = strrchr(ciperOkFile, '.');
+					if (pdian)
+						*pdian = 0;
 					
 	                snprintf(cmd, sizeof(cmd)-1, "dcraw -c -e %s/%s/raw/%s > %s/%s/jpg/%s.jpeg",
 						CNM_SERVER_PHOTOS_PATH, entry->d_name, ciperRawFile,
