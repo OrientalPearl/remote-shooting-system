@@ -1794,13 +1794,28 @@ void *ysf_convert_photo(void *arg)
 					strncpy(ciperOkFile, entry1->d_name, strlen(entry1->d_name)-3);
 					strncpy(ciperRawFile, entry1->d_name, strlen(entry1->d_name)-3);
 					
+					int nef = 1;
+					
 					char *pdian = strrchr(ciperOkFile, '.');
 					if (pdian)
+					{
+						if (!strcmp(pdian, ".jpeg"))
+							nef = 0;
 						*pdian = 0;
+					}
 					
-	                snprintf(cmd, sizeof(cmd)-1, "dcraw -c -e %s/%s/raw/%s > %s/%s/jpg/%s.jpeg",
-						CNM_SERVER_PHOTOS_PATH, entry->d_name, ciperRawFile,
-						CNM_SERVER_PHOTOS_PATH, entry->d_name, ciperOkFile);
+					if (nef)
+					{
+						snprintf(cmd, sizeof(cmd)-1, "dcraw -c -e %s/%s/raw/%s > %s/%s/jpg/%s.jpeg",
+							CNM_SERVER_PHOTOS_PATH, entry->d_name, ciperRawFile,
+							CNM_SERVER_PHOTOS_PATH, entry->d_name, ciperOkFile);
+					}
+					else
+					{
+						snprintf(cmd, sizeof(cmd)-1, "cp -af %s/%s/raw/%s %s/%s/jpg/%s.jpeg",
+							CNM_SERVER_PHOTOS_PATH, entry->d_name, ciperRawFile,
+							CNM_SERVER_PHOTOS_PATH, entry->d_name, ciperOkFile);
+					}
 	                
 	        		if (0 == sky_system(__FUNCTION__, __LINE__, cmd))
 	        		{
